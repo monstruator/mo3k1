@@ -100,7 +100,6 @@ qnx_name_attach(0,"4.1");
 while(1)
   {
 	//for(i=0;i<sizeof(obmen_41_31_t);i++) bufi[i]=0;
-
 	bytes = Udp_Client_Read(&Uc41,bufi,4096);
 //	printf(" read=%d size1=%d size2=%d size3=%d sizeALL=%d\n",
 //	bytes,sizeof(obmen_42_31_2t),sizeof(obmen_41_31_2t),sizeof(obmen_AK_MN3_MO3K_t),sizeof(obmen_MO3_MO3K_t));
