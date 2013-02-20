@@ -126,7 +126,9 @@ void main( int argc, char *argv[] )
 				case 1 : Write_K1(ZI); break;
 				//case 2 : Write_K1(SUM20); break;
 				case 3 : Write_K1(YP); break;
-				case 4 : Write_K1(DPL1); break;						
+				case 4 : Write_K1(DPL1); break;		
+				case 6 : Write_K1(RAZN1); break;	
+				case 7 : Write_K1(RAZN2); break;						
 				case 9 : //раз в пол сек выполняем сервисные операции
 						if (p->U.SUM_4>1e+8) p->U.SUM_20=(log10(p->U.SUM_4)-8)*16;	else p->U.SUM_20=0;
 						if (abs(p->from_MO3.from41.Fd*1000-Dopler1) > 35000) 

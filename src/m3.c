@@ -1,4 +1,4 @@
-#include <unistd.h>
+я╗┐#include <unistd.h>
 #include <time.h>
 #include <sys/wait.h>
 #include <sys/types.h>
@@ -172,8 +172,7 @@ for(;;)//----- CEPBEP -----//
    		if((dev->tx_B[3])!=15){owu6ka|=512;break;}
     	for(j=0;j<15;j++) p->Dout41[j]=dev->tx_B[4+j]; //--- npueM HK
 		//printf("N=%d",SIMF[0]);
-//
-		printf("ModA simf- "); 	for(j=0;j<15;j++) printf("%x ",p->Dout41[j]);printf("\n");
+		//printf("ModA simf- "); 	for(j=0;j<15;j++) printf("%x ",p->Dout41[j]);printf("\n");
 
 		//КАЧКИ
 		if (dev->tx_B[6]&0x8000) PSI=-(0xFFFF-dev->tx_B[6])*NAVtoRAD;
@@ -199,16 +198,26 @@ for(;;)//----- CEPBEP -----//
 		break;//--- end npueMHuk CEB ---//
 	case 7:case 8:owu6ka|=256;break; // HEBEPEH proxy CEB
 	case 9:   //Обмен с МодБ 
-		SIMF[2]++; //есть симфония ModB
+		SIMF[2]++; //есть  ModB
 		if (SIMF[2]==60000) SIMF[2]=0;		
 		i=Read_ModB(); //читаем данные из Мод Б
 		if (i!=48) break; //если не целый пакет - выход
-		if (Din_ModB[1]==0) p->to_MO3.to42.Mispr=p->to_MO3.to42.Mispr|0x0020; //признак наличия навигации в Мод Б
+		if (Din_ModB[1]==0) ispr.nkB=1; //признак наличия навигации в Мод Б
 		else {
-				p->to_MO3.to42.Mispr=p->to_MO3.to42.Mispr&0xffdf; //навигац Мод Б исправна
-			    if (p->to_MO3.to42.Mispr & 0x0010) //если нет навигации в Мод А
+				ispr.nkB=0; //навигац Мод Б исправна
+			    if (ispr.nkA==1) //если нет навигации в Мод А
 					for(j=0;j<15;j++) p->Dout41[j]=Din_ModB[j+2]; //используем из Б
-			 }				
+			 }		
+		if (Din_ModB[17]==0) ispr.sevB=ispr.sevB=1; //признак наличия СЕВ в Мод Б
+		else {
+				ispr.sevB=ispr.sevB=0; //навигац Мод Б исправна
+			    p->Dout41[30]=(Din_ModB[20]>>8)&0x000F;
+				p->Dout41[30]+=(Din_ModB[20]>>12)*10;     //hours
+				p->Dout41[31]=(Din_ModB[21]>>8)&0x000F;
+				p->Dout41[31]+=(Din_ModB[21]>>12)*10;	//minutes
+				p->Dout41[32]=Din_ModB[21]&0x000F;
+				p->Dout41[32]+=((Din_ModB[21]>>4)&0x000f)*10; //seconds
+			 }			 
 //
 		printf("ModB - ");	for(j=0;j<15;j++) printf("%x ",Din_ModB[j+2]);printf("\n");
 		break;
@@ -220,15 +229,10 @@ for(;;)//----- CEPBEP -----//
 		{
 			TIMER10++;
 			//printf("TIMER10=%d\n",TIMER10);
-			if (TIMER10<10) {p->to_MO3.to42.Mispr=p->to_MO3.to42.Mispr&0xff7f;} //есть пр1.0
-			else {p->to_MO3.to42.Mispr=p->to_MO3.to42.Mispr|0x0080;} //нет пр1.0 
+			if (TIMER10<10) ispr.mo1k=0; //есть пр1.0
+				else ispr.mo1k=1; //нет пр1.0 
 
-			p->Dout41[30]=(Din_ModB[20]>>8)&0x000F;
-			p->Dout41[30]+=(Din_ModB[20]>>12)*10;     //hours
-			p->Dout41[31]=(Din_ModB[21]>>8)&0x000F;
-			p->Dout41[31]+=(Din_ModB[21]>>12)*10;	//minutes
-			p->Dout41[32]=Din_ModB[21]&0x000F;
-			p->Dout41[32]+=((Din_ModB[21]>>4)&0x000f)*10; //seconds
+			
 			//printf("H=%d M=%d S=%d T41=%d T31=%d \n",p->Dout41[30],p->Dout41[31],p->Dout41[32],p->from_MO3.from41.T_SS,p->Dout41[30]*3600+p->Dout41[31]*60+p->Dout41[32]);			
 			//printf("navi=%d jump=%d \n",p->no_navi,p->jump);
 			
@@ -355,14 +359,14 @@ for(;;)//----- CEPBEP -----//
 			}
 				//-------------------------------------------------------------
 			TIMER41=0;
-			if (SIMF[1]<SIMF[0]) {p->to_MO3.to42.Mispr=p->to_MO3.to42.Mispr&0xffef;} //есть симф
-			else {p->to_MO3.to42.Mispr=p->to_MO3.to42.Mispr|0x0010;} //нет симф 
+			if (SIMF[1]<SIMF[0]) ispr.nkA=0; //есть симф A
+			else ispr.nkA=1; //нет симф 
 			SIMF[1]=SIMF[0];
- 			if (SIMF[3]<SIMF[2]) {p->to_MO3.to42.Mispr=p->to_MO3.to42.Mispr&0xfffd;} //есть МодБ
-			else {p->to_MO3.to42.Mispr=p->to_MO3.to42.Mispr|0x0022;} //нет симф 
+ 			if (SIMF[3]<SIMF[2]) ipsr.cvsB=0; //есть 
+			else ipsr.cvsB=ispr.sevB=ispr.nkB=1; //нет модБ,СЕВ,НК
 			SIMF[3]=SIMF[2];
 
-			if ((p->to_MO3.to42.Mispr&0x0020)&&(p->to_MO3.to42.Mispr&0x0010)) p->Dout41[24]=0;
+			if ((ispr.nkA==1)&&(ispr.nkB==1)) p->Dout41[24]=0;
 			else p->Dout41[24]=1;
   			//printf("ispr=%x simf=%x \n",p->to_MO3.to42.Mispr,p->Dout41[24]);
 			//printf("n_k=%d \n",p->num_com);
@@ -379,7 +383,7 @@ for(;;)//----- CEPBEP -----//
 		//printf("toPR1=%x from42=%f\n",toPR1[2],p->from_MO3.from41.beta);
 	 	if((KK_frame(dev,Ynp_np1,2,acmd))==-1){owu6ka|=16;break;}
 
-		if (p->to_MO3.to42.Mispr&0x0010) Write_ModB(); //если нет навигации запрос в Модуль Б
+		if (ispr.nkA==1) Write_ModB(); //если нет навигации запрос в Модуль Б
 		else if (N_TIMER&1) Write_ModB();//иначе частота 5 Гц 
 		break; 
  }// ----- end switch
