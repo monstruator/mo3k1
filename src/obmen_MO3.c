@@ -23,14 +23,8 @@
   #define SVC   0x0400
   #define SVCFC 0x0800
 
-  #define RAD 5729.57	
   #define SRC_PORT41 8208
   #define DST_PORT41 8208
-  #define pi 	3.14159265
-  #define GRADtoRAD  0.00153398
-  #define RADtoGRAD 651.898648
-  #define Kncu 	12.27
-  #define Kq 	0.5
 
   # define max_len_OUT    4096*8
   # define max_len_IP     4096*8
@@ -50,6 +44,7 @@
 	char out_buf[1024];
 	//obmen_41_31_t from41;	
 	//obmen_31_41_t to41;	
+	paramAKcom=0;
 	simfonia41_t simfonia;	
 	int r,bytes,byta4;
 	pid_t pid_CEP;
@@ -100,21 +95,21 @@ qnx_name_attach(0,"4.1");
 while(1)
   {
 	//for(i=0;i<sizeof(obmen_41_31_t);i++) bufi[i]=0;
+
 	bytes = Udp_Client_Read(&Uc41,bufi,4096);
-//	printf(" read=%d size1=%d size2=%d size3=%d sizeALL=%d\n",
-//	bytes,sizeof(obmen_42_31_2t),sizeof(obmen_41_31_2t),sizeof(obmen_AK_MN3_MO3K_t),sizeof(obmen_MO3_MO3K_t));
+	printf(" read=%d size1=%d size2=%d size3=%d sizeALL=%d\n",
+	bytes,sizeof(obmen_42_31_2t),sizeof(obmen_41_31_2t),sizeof(obmen_AK_MN3_MO3K_t),sizeof(obmen_MO3_MO3K_t));
 
     memcpy(&p->from_MO3,&bufi[4],sizeof(obmen_MO3_MO3K_t)); 
-	//выбор управляющей команды
+	//выбор управляюще1 команды
 	if (p->from_MO3.from41.cr_com!=cr_com41) 
 	{
-		printf(" New Command 4.1 = %d  cr_com = %d\n",p->from_MO3.from41.num_com,p->from_MO3.from41.cr_com);
 		p->num_com=p->from_MO3.from41.num_com;
 		cr_com41=p->from_MO3.from41.cr_com;
 		p->M[0]=0x0000;
 		p->M[1]=0x000e;
 		p->M[2]=0x0000;
-		p->M[3]=0x8210;		
+		p->M[3]=0x8410;		
 	}
 	if (p->from_MO3.from42.cr_com!=cr_com42) 
 	{
@@ -123,16 +118,18 @@ while(1)
 
 		p->num_com=p->from_MO3.from42.num_com;
 		cr_com42=p->from_MO3.from42.cr_com;
-		p->M[0]=p->from_MO3.from42.M1;
-		p->M[1]=p->from_MO3.from42.M2;
-		p->M[2]=p->from_MO3.from42.M3;
-		p->M[3]=p->from_MO3.from42.M4;
-		buf[0]=0;	//переворачиваем управляющие слова пр. 1
-		for(i1=0;i1<16;i1++) {buf[0]+=((p->M[0]>>i1)&1)<<(15-i1);} p->M[0]=buf[0];buf[0]=0;
-		for(i1=0;i1<16;i1++) {buf[0]+=((p->M[1]>>i1)&1)<<(15-i1);} p->M[1]=buf[0];buf[0]=0;
-		for(i1=0;i1<16;i1++) {buf[0]+=((p->M[2]>>i1)&1)<<(15-i1);} p->M[2]=buf[0];buf[0]=0;
-		for(i1=0;i1<16;i1++) {buf[0]+=((p->M[3]>>i1)&1)<<(15-i1);} p->M[3]=buf[0];buf[0]=0;
-
+		if (p->num_com==5)
+		{
+			p->M[0]=p->from_MO3.from42.M1;
+			p->M[1]=p->from_MO3.from42.M2;
+			p->M[2]=p->from_MO3.from42.M3;
+			p->M[3]=p->from_MO3.from42.M4;
+			buf[0]=0;	//переворачиваем управляющие слова пр. 1
+			for(i1=0;i1<16;i1++) {buf[0]+=((p->M[0]>>i1)&1)<<(15-i1);} p->M[0]=buf[0];buf[0]=0;
+			for(i1=0;i1<16;i1++) {buf[0]+=((p->M[1]>>i1)&1)<<(15-i1);} p->M[1]=buf[0];buf[0]=0;
+			for(i1=0;i1<16;i1++) {buf[0]+=((p->M[2]>>i1)&1)<<(15-i1);} p->M[2]=buf[0];buf[0]=0;
+			for(i1=0;i1<16;i1++) {buf[0]+=((p->M[3]>>i1)&1)<<(15-i1);} p->M[3]=buf[0];buf[0]=0;
+		}
 	}
 	if ((p->from_MO3.fromAK.cr_com!=cr_comAK)&&(p->from_MO3.fromAK.num_com!=0)) 
 	{
@@ -141,44 +138,52 @@ while(1)
 		pr1_c_old=p->pr1_c;	//сохраним счетчик обмена с пр.1
 		AK_c=1;
 		p->to_MO3.toAK.kzv=0;
-		printf(" New Command AK = %d , p[0]=%d , cr_com = %d\n",p->from_MO3.fromAK.num_com,p->from_MO3.fromAK.a_params[0],p->from_MO3.fromAK.cr_com);
-		p->M[2]=p->M[2]|0x8000; //РЭЛЕ АК
+		printf(" New Command AK = %d , p[0]=%d , cr_com = %d\n",
+				p->from_MO3.fromAK.num_com,p->from_MO3.fromAK.a_params[0],p->from_MO3.fromAK.cr_com);
+		p->M[2]=0x0001; //РЭЛЕ АК
 		bM4=0;
+		paramAKcom=0;
 		switch(p->num_com)
 		{
-			case 260 : case 290 :	p->M[3]=0x0821;break;
-			case 264 :	p->M[3]=0x0A29;break;
+			case 260 : case 290 :	paramAKcom=1;break;//8410
+			case 264 :				paramAKcom=2;break;
 			case 265 : 	switch(p->from_MO3.fromAK.a_params[0])
 						{
-							case 2:	case 3: p->M[3]=0x0C35;break; 
+							case 2:	case 3: paramAKcom=3;break; 
 							case 4: case 5: 
 							case 6:	case 7: 
-							case 8: case 9: p->M[3]=0x0821;break;
+							case 8: case 9: paramAKcom=1;break;
 						}
 						break;
 			case 292 : 	switch(p->from_MO3.fromAK.a_params[0])
 						{
-							case 1: p->M[3]=0x0821;break;
-							case 3:	p->M[3]=0x0A29;break;
-							case 5: p->M[3]=0x0C35;break; 
+							case 1: paramAKcom=1;break;
+							case 3:	paramAKcom=2;break;//C430
+							case 5: paramAKcom=3;break;//9450
 						}
 						break;
 			case 300 : 	switch(p->from_MO3.fromAK.a_params[0])
 						{
-							case 0: p->M[3]=0x0821;break;
-							case 1:	p->M[3]=0x0C35;break;
+							case 0: paramAKcom=1;break;
+							case 1:	paramAKcom=3;break;
 						}
 						break;
 		}
-		buf[0]=0;	//переворачиваем управляющие слова пр. 1
-		//for(i1=0;i1<16;i1++) {buf[0]+=((p->M[0]>>i1)&1)<<(15-i1);} p->M[0]=buf[0];buf[0]=0;
-		//for(i1=0;i1<16;i1++) {buf[0]+=((p->M[1]>>i1)&1)<<(15-i1);} p->M[1]=buf[0];buf[0]=0;
-		for(i1=0;i1<16;i1++) {buf[0]+=((p->M[2]>>i1)&1)<<(15-i1);} p->M[2]=buf[0];buf[0]=0;
-		for(i1=0;i1<16;i1++) {buf[0]+=((p->M[3]>>i1)&1)<<(15-i1);} p->M[3]=buf[0];buf[0]=0;
+		switch(paramAKcom)
+		{
+			case 1 : p->M[3]=0x8410;break;
+			case 2 : p->M[3]=0xC430;break;
+			case 3 : p->M[3]=0x9450;break;
+		}
 	}
 
+	
+	//printf("V=%d\n",V);
+	//printf("V=%f\n",p->from41.Vr);
+	//for(i=4;i<20;i++) printf("%x ",bufi[i]);printf("\n");
 	//printf("crcom=%x n_com=%x NKS=%x NSHKR=%x Nd_FR4=%x N_FR4=%x ZUNf=%x N_psp=%x Vr=%f Ar=%f\n",
-	//p->from41.cr_com,p->from41.num_com,p->from41.num_KS,p->from41.Nkey_SHAKR,p->from41.Nd_FRCH,p->from41.N_FRCH,
+	//p->from41.cr_com,p->from41.num_com,p->from41.num_KS,
+	//p->from41.Nkey_SHAKR,p->from41.Nd_FRCH,p->from41.N_FRCH,
 	//p->from41.ZUNf,p->from41.Nans_PSP,p->from41.Vr,p->from41.Ar);
 
 	//SIMFONIA
@@ -212,7 +217,7 @@ while(1)
 	p->to_MO3.to41.UR_sign_K1=(short)p->U.SUM_20;	
 	if (p->to_MO3.to41.UR_sign_K1>17) p->to_MO3.to41.PrM_K1=1;else p->to_MO3.to41.PrM_K1=0;
 
-//	printf(" Angle_Pr1 = %4.3f %4.3f   ",p->to_MO3.to41.beta_FACT*57.3,p->to_MO3.to41.P_FACT*57.3);
+//	printf(" Angle_Pr1 b=%4.3f q=%4.3f   \n",p->to_MO3.to41.beta_FACT*57.3,p->to_MO3.to41.P_FACT*57.3);
 //	printf(" Angle_PR4 = %4.3f %4.3f\n",p->from_MO3.from41.beta*57.3,p->from_MO3.from41.P_ANT*57.3);
 //	printf("					 P_ANT = %4.3f", p->from_MO3.from41.P_ANT*57.3);
 //	printf(" P_FACT = %4.3f  com42=%d \n",p->to_MO3.to41.P_FACT*57.3,p->from42.num_com);
@@ -310,26 +315,31 @@ while(1)
 
 //	printf(" q=%8.4f a=%8.4f b=%8.4f \n",p->to_MO3.to42.q,p->to_MO3.to42.alfa,p->to_MO3.to42.beta);
 //	p->to_MO3.to42.q=p->to_MO3.to42.alfa=p->to_MO3.to42.beta=1;
-    
-
+//	if ((p->PR1[3]&0x0008)&&(p->PR1[5]&0x0004)) printf("!!!\n");    
+//	for(i=0;i<3;i++) printf("%04x ",p->PR1[3+i]);printf("\n");
 ////////////////////////////UPR AK//////////////////////////////////////
 	if (AK_c>0) //пакет с новой командой АК
 	{
-		if (p->pr1_c - pr1_c_old>2) //больше 2 ответов от Пр.1
+		if (p->pr1_c - pr1_c_old>20) //больше 2 ответов от Пр.1
 		{
 			p->to_MO3.toAK.cr_com=p->from_MO3.fromAK.cr_com;
 			p->to_MO3.toAK.num_com=p->from_MO3.fromAK.num_com;
 			p->to_MO3.toAK.lp2_param=p->from_MO3.fromAK.a_params[0];
-			p->to_MO3.toAK.kzv=0;
+			p->to_MO3.toAK.kzv=1;
 			AK_c=0;
+			printf("paramAKcom=%d\n",paramAKcom);
+			switch(paramAKcom)
+			{
+				case 1 : case 3 : if ((p->PR1[3]&0x0004)&&(p->PR1[5]&0x0004)) p->to_MO3.toAK.kzv=0;	break;
+				case 2 : 		  if ((p->PR1[3]&0x0004)&&(p->PR1[5]&0x0006)) p->to_MO3.toAK.kzv=0;	break;
 
-			p->from_MO3.from42.M4=p->from_MO3.from42.M4&0x07FF; //Отключение ФК СВЧ КА
-			buf[0]=0;
-			for(i1=0;i1<16;i1++) {buf[0]+=((p->from_MO3.from42.M4>>i1)&1)<<(15-i1);} p->from_MO3.from42.M4=buf[0];buf[0]=0;
+			}
+
+			//p->M[3]=p->M[3]&0xFFFE; //Отключение ФК СВЧ КА
 			printf("Окончание команды %d. kzv=%d\n",p->to_MO3.toAK.num_com,p->to_MO3.toAK.kzv);
 
 			}
-		else 	if (AK_c>3)
+		else 	if (AK_c>10)  //2
 				{
 					p->to_MO3.toAK.cr_com=p->from_MO3.fromAK.cr_com;
 					p->to_MO3.toAK.num_com=p->from_MO3.fromAK.num_com;

@@ -81,7 +81,7 @@ unsigned int    Tcount, 		//счетчик таймера
 				Ncount;		//кол-во повторений
 unsigned state;
 unsigned char c;
-div_t msec; 
+div_t msec1; 
 time_t time_of_day;
 char b[80];
 int N_COM=1;//,KVIT=0;//,ILS=0,LK11=0;
@@ -158,9 +158,9 @@ write_com (Ncom)
 
 	//printf("время : %d  <---  (",Tcount);
 	time_of_day=time(NULL);
-	msec=div(Tcount,10);
+	msec1=div(Tcount,10);
 	strftime(b, 40 , "%T", localtime(&time_of_day));//D T
-	printf("%s:%03d <-- (",b,msec.rem*100);			
+	printf("%s:%03d <-- (",b,msec1.rem*100);			
 	for(i1=0;i1<test_K2[Ncom][1]+1;i1++) printf("%x.",test_K2[Ncom][i1]);
 	N_COM++;Ncount++;
 	Tcount_com=Tcount;
@@ -310,8 +310,8 @@ main(int argc, char *argv[]) {
 					//printf("N=%d \n",N);					
 					time_of_day=time(NULL);
 					strftime(b, 40 , "%T", localtime(&time_of_day));//D T
-					msec=div(Tcount,10);
-					printf("%s:%03d -->",b,msec.rem*100);			
+					msec1=div(Tcount,10);
+					printf("%s:%03d -->",b,msec1.rem*100);			
 					for(i1=0;i1<N;i1++) chkSUM+=buffer[i+i1]; //подсчет контр суммы         
 					//printf("i=%d chkSUM=%x\n",i,chkSUM);
 					if (chkSUM!=buffer[N+i]) //если не совпадает контр сумма

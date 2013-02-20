@@ -20,23 +20,7 @@
 #include "../include/tx_drv.h"
 #include "../include/Mod_B.h"
 //-----------//
-#define PI 3.1415926
-#define NAVtoRAD PI/(65356)
-#define Kmema 12.27
-#define Maxncu 0x4AA
-#define Minncu 0xF55
-#define Maxmema 0x7A2
-#define Minmema 0x85D
-#define GRADtoRAD  0.00153398
-#define RADtoGRAD 651.898648
-#define pi 	3.14159265
-#define Kncu 	12.27
-#define msec 1000000
-#define Kq 	0.5
-#define P 1 //  pa3peweHue 1/3anpem 0 ne4amu
-#define tow 50 // napaMemp owugaHuR uMeH=5c
-
-		 //----- onucaHue nepeMeHHblx np.1.0 -----//
+//----- onucaHue nepeMeHHblx np.1.0 -----//
 short K2Init=0;//момент настройки К2 при команде "Начало СС"
 float oldKK,deltaKK;
 float grad=180.0/PI;
@@ -47,7 +31,7 @@ float Flt=0;
 int Seans=0; //признак начала сеанса по К2
 unsigned short toPR1[8]=
 //{0x07C7,0x0000,0x0000,0x0000,0x7000,0x0000,0x0841,0};
-{0x07C7,0x0000,0x0000,0x0000,0x000e,0x0000,0x8210,0};
+{0x07C7,0x0000,0x0000,0x0000,0x000e,0x0000,0x8410,0};
 
 struct DefCMD acmd[2]=
 {{0x1028,toPR1},{0x1428,NULL}}; // KC+D[] MK npu6opa 1
@@ -56,7 +40,6 @@ struct DefCMD acmd[2]=
 void main(int argc, char *argv[])
 {int i,j,k,res;
 	int cnt_K2=0;
-	struct ispr_mo3k *ispr;
     pid_t pid_timer;
     timer_t id_timer;
 	struct itimerspec timer;
@@ -66,6 +49,9 @@ void main(int argc, char *argv[])
 	unsigned int N_TIMER=0;//кол-во срабатываний таймера
 	short TIMER10=0;//обмен с пр1.0	
 	short TIMER41=0;	
+	float A; //угол поправки по разности
+	struct ispr_mo3k *ispr;
+
 //----- onucaHue gaHHblx npu pa6ome c MK -----//
 int short owu6ka,i1;
 pid_t pid,pid_K1,pid_41,pid_42;
@@ -75,6 +61,7 @@ unsigned short q=1,ncu=2,mema=3;
 int StateK1=1,StateK2=0;//0 - stop, 1-start
 int TestK2=0;//доп настройки К2
 float 	C1,C2,C3,C4,C5,C6,C7,C8;
+int A1;
 int TIMESEV,setANT=0,minus_x;
 	double PSI=0,TETA=0,oldPSI,oldTETA;
 	double x,y,x1,y1,C,S,ri,r1,r2,r3,
@@ -114,7 +101,7 @@ unsigned short DCEB[6];//Dout42[V];
 	create_shmem();
 	delay(1000);
 	open_shmem();
-	
+
 	ispr = (struct ispr_mo3k *) p->to_MO3.to42.Mispr;
 	p->pr1_c=0;
 	//----- Hacmpouka MaH4ecm.KaH. -----//
@@ -127,10 +114,10 @@ unsigned short DCEB[6];//Dout42[V];
 	p->to_MO3.to42.Mispr=0;
 	p->toPR1[0]=0x07C7;
 	p->toPR1[1]=p->toPR1[2]=p->toPR1[3]=0x0000;
-	p->toPR1[4]=0x000e;
-	p->toPR1[5]=0x0000;
-	p->toPR1[6]=0x8210;
-	p->toPR1[7]=0;
+	p->M[0]=0;
+	p->M[1]=0x000e;
+	p->M[2]=0x0000;
+	p->M[3]=0x8410;
 
 for(;;)//----- CEPBEP -----//
 {
@@ -154,7 +141,7 @@ for(;;)//----- CEPBEP -----//
 		if(KK_end(dev,Ynp_np1,2)==-1){owu6ka|=2;break;}
 		p->pr1_c++;
 		for(i=0;i<8;i++) p->PR1[i]=dev->tx_B[10+i];
-		//for(i=0;i<3;i++) printf(" in[%d]=%04x",i,dev->tx_B[10+i]);printf("\n");
+		//for(i=0;i<8;i++) printf(" in[%d]=%04x",i,dev->tx_B[10+i]);printf("\n");
 		//for(i=0;i<3;i++) printf("  to[%d]=%x",i,toPR1[i]);printf("\n");
 		//for(i=0;i<1;i++) printf("from   %d",p->PR1[i]);
 
@@ -185,7 +172,8 @@ for(;;)//----- CEPBEP -----//
    		if((dev->tx_B[3])!=15){owu6ka|=512;break;}
     	for(j=0;j<15;j++) p->Dout41[j]=dev->tx_B[4+j]; //--- npueM HK
 		//printf("N=%d",SIMF[0]);
-		//printf("ModA simf- "); 	for(j=0;j<15;j++) printf("%x ",p->Dout41[j]);printf("\n");
+//
+		printf("ModA simf- "); 	for(j=0;j<15;j++) printf("%x ",p->Dout41[j]);printf("\n");
 
 		//КАЧКИ
 		if (dev->tx_B[6]&0x8000) PSI=-(0xFFFF-dev->tx_B[6])*NAVtoRAD;
@@ -206,6 +194,8 @@ for(;;)//----- CEPBEP -----//
 		if(ou_read(dev,CEB,nogAgpecCEB)){owu6ka|=64;break;}
 		if((dev->tx_B[3])!=6){owu6ka|=128;break;}
 		for(j=0;j<6;j++)DCEB[j]=dev->tx_B[4+j]; //--- npueM CEB
+//
+		for(j=0;j<6;j++)printf("CEB=%x",DCEB[j]); //--- npueM CEB
 		break;//--- end npueMHuk CEB ---//
 	case 7:case 8:owu6ka|=256;break; // HEBEPEH proxy CEB
 	case 9:   //Обмен с МодБ 
@@ -219,7 +209,8 @@ for(;;)//----- CEPBEP -----//
 			    if (p->to_MO3.to42.Mispr & 0x0010) //если нет навигации в Мод А
 					for(j=0;j<15;j++) p->Dout41[j]=Din_ModB[j+2]; //используем из Б
 			 }				
-		//printf("ModB - ");	for(j=0;j<15;j++) printf("%x ",Din_ModB[j+2]);printf("\n");
+//
+		printf("ModB - ");	for(j=0;j<15;j++) printf("%x ",Din_ModB[j+2]);printf("\n");
 		break;
 	case 12://обработчик таймера (10 Гц) 
 		N_TIMER++;//счетчик тиков 
@@ -339,16 +330,30 @@ for(;;)//----- CEPBEP -----//
 		    	else p->toPR1[2]=(360+(-p->from_MO3.from42.beta*C3))*C2;//
 			    if (p->from_MO3.from42.alfa>=0)	p->toPR1[1]=p->from_MO3.from42.alfa*C4;//KPEH
 			    else p->toPR1[1]=0xFFF+(p->from_MO3.from42.alfa*RADtoGRAD)*12.27;
-				p->toPR1[0]=p->from_MO3.from42.q*RADtoGRAD/2+1991;//Азимут				
-			
+
+				//if (p->U.SUM_20>30)	A=(p->U.RAZN_0*5.53)/RAD;
+				//else 				A=0;
+				p->toPR1[0]=(p->from_MO3.from42.q)*RADtoGRAD/2+1991;//Азимут				
 			}
-			if (p->num_com==301) //4-я или 5-я команда из 4.2
-			{	//управление пр. 1.0 из 4.2 //Углы
-    			if (p->from_MO3.fromAK.beta>=0)	p->toPR1[2]=-p->from_MO3.fromAK.beta*C1;//Угол места
+			//printf("n_c=%d \n",p->num_com);
+	    	if (p->num_com==50) //50-я команда из 4.2
+			{
+				printf("lvl = %f ",p->U.SUM_20);
+				printf("r0 = %f ",p->U.RAZN_0);
+
+				if ((p->U.SUM_20>30)&&(abs(p->U.RAZN_0<1.1)))	
+						A1=-p->U.RAZN_0*31.48;
+				else	A1=0;
+				p->toPR1[0]=(p->PR1[0]&0x0fff)+A1;
+				printf("Pr1=%d A1=%d newPr1+%d\n",p->PR1[0]&0x0fff,A1,p->toPR1[0]);
+			}
+			if (p->num_com==301) //4-  шыш 5-  ъюьрэфр шч 4.2
+			{	//єяЁртыхэшх яЁ. 1.0 шч 4.2 //╙уы√
+    			if (p->from_MO3.fromAK.beta>=0)	p->toPR1[2]=-p->from_MO3.fromAK.beta*C1;//╙уюы ьхёЄр
 		    	else p->toPR1[2]=(360+(-p->from_MO3.fromAK.beta*C3))*C2;//
-				p->toPR1[0]=p->from_MO3.fromAK.Peleng*RADtoGRAD/2+1991;//Азимут			
+				p->toPR1[0]=p->from_MO3.fromAK.Peleng*RADtoGRAD/2+1991;//└чшьєЄ			
 			}
-			//-------------------------------------------------------------
+				//-------------------------------------------------------------
 			TIMER41=0;
 			if (SIMF[1]<SIMF[0]) {p->to_MO3.to42.Mispr=p->to_MO3.to42.Mispr&0xffef;} //есть симф
 			else {p->to_MO3.to42.Mispr=p->to_MO3.to42.Mispr|0x0010;} //нет симф 
@@ -370,7 +375,7 @@ for(;;)//----- CEPBEP -----//
 		for(i=0;i<3;i++) p->toPR1[i]=p->toPR1[i]&0x0fff;
 		//-------------------------- 1 Pr -------------------------
 		for(i=0;i<8;i++) toPR1[i]=p->toPR1[i];
-		for(i=0;i<8;i++) printf("  %x",toPR1[i]);printf("\n");
+		//for(i=0;i<8;i++) printf("  %x",toPR1[i]);printf("\n");
 		//printf("toPR1=%x from42=%f\n",toPR1[2],p->from_MO3.from41.beta);
 	 	if((KK_frame(dev,Ynp_np1,2,acmd))==-1){owu6ka|=16;break;}
 

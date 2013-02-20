@@ -1,6 +1,22 @@
 #include "obmenVS_AK_MO3K.h"
 #include "obmen_220113.h"
 
+#define PI 3.14159 
+#define NAVtoRAD PI/(65356)
+#define Kmema 12.27
+#define Maxncu 0x4AA
+#define Minncu 0xF55
+#define Maxmema 0x7A2
+#define Minmema 0x85D
+#define GRADtoRAD  0.00153398
+#define RADtoGRAD 651.898648
+#define pi 	3.14159  
+#define Kncu 	12.27
+#define msec 1000000
+#define Kq 	0.5
+#define P 1 //  pa3peweHue 1/3anpem 0 ne4amu
+#define tow 50 // napaMemp owugaHuR uMeH=5c
+#define RAD 5729.57	
 #define SUM_DCP_K1			1250	//max число  используемых слов в массиве ДЦП K1
 #define SUM_DCP_K2			6250	//max число  используемых слов в массиве ДЦП K2
 
