@@ -85,7 +85,7 @@ unsigned int DPL_2,
 } UPOS;
 
 	struct ispr_mo3k {
-		//первый байт исправностей
+		//
 		unsigned int cvsA : 1;
 		unsigned int cvsB : 1;
 		unsigned int k1 : 1;
@@ -94,7 +94,7 @@ unsigned int DPL_2,
 		unsigned int nkB : 1;
 		unsigned int sevA : 1;
 		unsigned int mo1k : 1;
-		//второй байт исправностей  
+		//  
 		unsigned int gl : 1;
 		unsigned int sevB : 1;
 		unsigned int reserv : 6;

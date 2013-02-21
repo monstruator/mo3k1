@@ -97,8 +97,8 @@ while(1)
 	//for(i=0;i<sizeof(obmen_41_31_t);i++) bufi[i]=0;
 
 	bytes = Udp_Client_Read(&Uc41,bufi,4096);
-	printf(" read=%d size1=%d size2=%d size3=%d sizeALL=%d\n",
-	bytes,sizeof(obmen_42_31_2t),sizeof(obmen_41_31_2t),sizeof(obmen_AK_MN3_MO3K_t),sizeof(obmen_MO3_MO3K_t));
+//	printf(" read=%d size1=%d size2=%d size3=%d sizeALL=%d\n",
+//	bytes,sizeof(obmen_42_31_2t),sizeof(obmen_41_31_2t),sizeof(obmen_AK_MN3_MO3K_t),sizeof(obmen_MO3_MO3K_t));
 
     memcpy(&p->from_MO3,&bufi[4],sizeof(obmen_MO3_MO3K_t)); 
 	//выбор управляюще1 команды
@@ -171,9 +171,9 @@ while(1)
 		}
 		switch(paramAKcom)
 		{
-			case 1 : p->M[3]=0x8410;break;
-			case 2 : p->M[3]=0xC430;break;
-			case 3 : p->M[3]=0x9450;break;
+			case 1 : p->M[3]=0x8410;printf("M=1\n");break;
+			case 3 : p->M[3]=0xC430;printf("M=3\n");break;
+			case 2 : p->M[3]=0x9450;printf("M=2\n");break;
 		}
 	}
 
@@ -284,12 +284,15 @@ while(1)
 //	printf(" CR=%d NC=%d \n",p->from_MO3.from42.cr_com,p->from_MO3.from42.num_com);
 //  printf("\n");  
   
-	p->to_MO3.to42.Ms1=p->PR1[3];   //состояние прибора 1.0
-	p->to_MO3.to42.Ms2=p->PR1[4];
-	p->to_MO3.to42.Ms3=p->PR1[5];
+//	p->to_MO3.to42.Ms1=p->PR1[3];   //состояние прибора 1.0
+//	p->to_MO3.to42.Ms2=p->PR1[4];
+//	p->to_MO3.to42.Ms3=p->PR1[5];
 	p->to_MO3.to42.USign=p->PR1[6]; //уровень сигнала ПРД из сост ПР1.0
 
-	p->to_MO3.to42.sum_K1=p->U.SUM_4;
+	
+//	p->to_MO3.to42.sum_K1=p->U.SUM_4;
+	p->to_MO3.to42.sum_K1=p->U.SUM_20; //выводить после логарифма
+	
 
 	p->to_MO3.to42.D_K1=(float)p->U.DPL_1*244.14;
 
@@ -320,7 +323,7 @@ while(1)
 ////////////////////////////UPR AK//////////////////////////////////////
 	if (AK_c>0) //пакет с новой командой АК
 	{
-		if (p->pr1_c - pr1_c_old>20) //больше 2 ответов от Пр.1
+		if (p->pr1_c - pr1_c_old>10) //больше 2 ответов от Пр.1
 		{
 			p->to_MO3.toAK.cr_com=p->from_MO3.fromAK.cr_com;
 			p->to_MO3.toAK.num_com=p->from_MO3.fromAK.num_com;
@@ -330,13 +333,16 @@ while(1)
 			printf("paramAKcom=%d\n",paramAKcom);
 			switch(paramAKcom)
 			{
-				case 1 : case 3 : if ((p->PR1[3]&0x0004)&&(p->PR1[5]&0x0004)) p->to_MO3.toAK.kzv=0;	break;
-				case 2 : 		  if ((p->PR1[3]&0x0004)&&(p->PR1[5]&0x0006)) p->to_MO3.toAK.kzv=0;	break;
+				case 1 : case 3 : 
+					if ((p->PR1[3]&0x0004)&&(p->PR1[5]&0x0004)) p->to_MO3.toAK.kzv=0;	break;
+//					if (p->PR1[3]&0x0004) p->to_MO3.toAK.kzv=0;	break;
+				case 2 : 		  
+					if ((p->PR1[3]&0x0004)&&(p->PR1[5]&0x0006)) p->to_MO3.toAK.kzv=0;	break;
+//					if (p->PR1[3]&0x0004) p->to_MO3.toAK.kzv=0;	break;
 
 			}
-
 			//p->M[3]=p->M[3]&0xFFFE; //Отключение ФК СВЧ КА
-			printf("Окончание команды %d. kzv=%d\n",p->to_MO3.toAK.num_com,p->to_MO3.toAK.kzv);
+			printf("Окончание команды %d. kzv=%d pr1.3=%x pr1.5=%x\n",p->to_MO3.toAK.num_com,p->to_MO3.toAK.kzv,p->PR1[3],p->PR1[5]);
 
 			}
 		else 	if (AK_c>10)  //2

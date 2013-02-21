@@ -152,7 +152,7 @@ switch(s)
 	if((dev->tx_B[3])!=6) {break;}			 //ª®«-¢® á«®¢ != 6
 	for(j=0;j<6;j++) Dout[18+j]=dev->tx_B[4+j]; //--- npueM CEB
 	errCEB=0; Dout[17]=1;
-//	printf("‘…‚\n");
+	printf("‘…‚\n");
 	break; //--- end npueMHuk CEB ---//
 
   case 5:case 6: break; // HEBEPEH proxy CEB

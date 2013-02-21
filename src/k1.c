@@ -4,7 +4,7 @@
 #include <sys/proxy.h>
 #include <sys/kernel.h>
 #include <stdlib.h>
-#include "../include/K1.h"
+#include "../include/k1.h"
 
 #include <math.h>
 #define MS 1000000
@@ -24,7 +24,9 @@ void main( int argc, char *argv[] )
     struct sigevent event;
 	short i_p=0;
 	float Dopler1,m_porog[2];
-
+	float Dpl_42; //доплер с 4.2
+	float sum20[10];
+	int count20=0;
 	while( (i=getopt(argc, argv, "mis:") )!=-1)	{
 		switch(i){
 			case 'p' :  break;
@@ -76,7 +78,7 @@ void main( int argc, char *argv[] )
 	writePorogs(porog_sf, porog_df);
 	//Test_GL();
 	printf("Расчет среднего значения уровня суммарного канала ... \n");
-	while(f <= 1000) {
+	while(f <= 10) {
 		Write_K1(SUM4);
 		delay(90);
 		pid=Receive( 0 , 0, 0 );				
@@ -91,7 +93,7 @@ void main( int argc, char *argv[] )
     timer.it_value.tv_sec     = 3L; //start after X sec
     timer.it_value.tv_nsec    = 0L;
     timer.it_interval.tv_sec  = 0;
-    timer.it_interval.tv_nsec = 100*MS;
+    timer.it_interval.tv_nsec = 70*MS; //100
     timer_settime( id, 0, &timer, NULL );
 
     while(1) 
@@ -126,20 +128,33 @@ void main( int argc, char *argv[] )
 				case 1 : Write_K1(ZI); break;
 				//case 2 : Write_K1(SUM20); break;
 				case 3 : Write_K1(YP); break;
-				case 4 : Write_K1(DPL1); break;		
-				case 6 : Write_K1(RAZN1); break;	
-				case 7 : Write_K1(RAZN2); break;						
+				case 4 : Write_K1(RAZN0); break;
+				case 5 : Write_K1(RAZN1); break;
+				//case 4 : Write_K1(DPL1); break;						
 				case 9 : //раз в пол сек выполняем сервисные операции
 						if (p->U.SUM_4>1e+8) p->U.SUM_20=(log10(p->U.SUM_4)-8)*16;	else p->U.SUM_20=0;
-						if (abs(p->from_MO3.from41.Fd*1000-Dopler1) > 35000) 
+						if ((p->num_com!=6)&&(abs(p->from_MO3.from41.Fd*1000-Dopler1) > 35000)) 
 						{
 							Dopler1=(float)p->from_MO3.from41.Fd*1000;
 							writeDopler(-Dopler1);
 						}
+					
+						if ((p->num_com==6)&&(p->from_MO3.from42.Fd!=Dpl_42))
+						{
+							Dopler1=(float)p->from_MO3.from42.Fd*1000;
+							//writeDopler(-Dopler1);
+							Dpl_42=p->from_MO3.from42.Fd;
+							printf("d_from41=%e\n",p->from_MO3.from42.Fd);
+						}
+						sum20[count20]=p->U.SUM_20;
+						count20++;
+						if (count20==7) count20=0;
+						p->U.SUM_20=0;
+						for(i=0;i<9;i++) p->U.SUM_20+=sum20[i]/8;
 
 						//printf("lvl = %f data=%d\n",p->U.SUM_20,data_count);
 						//printf("n_com_from_k1 = %x \n",p->num_com);
-						printf("SUM_4=%3.3e  	SUM_20=%3.3e 	DPL=%d hz\n",p->U.SUM_4,p->U.SUM_20,p->U.DPL_1*244);
+						//printf("SUM_4=%3.3e  	SUM_20=%3.3e 	DPL=%d hz\n",p->U.SUM_4,p->U.SUM_20,p->U.DPL_1*244);
 					
 						//printf("OI=%x c_OI=%x\n",p->U.OI,p->U.c_OI);				
 						//printf("ZI_DATA=%x	 ZI_DOST=%x\n",p->U.ZI_DATA,p->U.ZI_DOST);
@@ -149,8 +164,6 @@ void main( int argc, char *argv[] )
 //						m_porog[0]=p->U.SUM_4;
 						if(m_porog[0]==p->U.SUM_4) {p->U.SUM_20=0;} 
 						m_porog[0]=p->U.SUM_4;
-
-	
 						break;
 			}
 
