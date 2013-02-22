@@ -15,7 +15,7 @@
 //-------k2----
 pid_t proxy_DRV2=0,pid,
 	  proxy_RS; // Mod_B 
-unsigned short Din_ModB[30];  
+unsigned char Din_ModB[30];  
 char masK2[]={0x55, 0x04, 0x03, 0x01, 0x5d};
 int rez=0, err=0 ;
 int Ptec,lvlK2;
@@ -92,6 +92,6 @@ int Read_ModB ()
 //	printf ("rd_cpcs_s.cnl=%d   rd_cpcs_r.cnt= %d\n", rd_cpcs_s.cnl, rd_cpcs_r.cnt);
 //	for(i=0;i<rd_cpcs_r.cnt;i++) printf(" %2x",rd_cpcs_r.uim.dt[i]); printf("\n");
 	memcpy(&Din_ModB, &rd_cpcs_r.uim.dt, sizeof(Din_ModB));
-	//for(i=0;i<24;i++) printf(" %d %4x",i, Din_ModB[i]); printf("\n");	
+//	for(i=0;i<5;i++) printf("%x ",Din_ModB[i]); printf("\n");	
 	return rd_cpcs_r.cnt; //вернем кол-во прочитанных байт
 }

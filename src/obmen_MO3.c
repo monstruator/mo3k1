@@ -334,8 +334,8 @@ while(1)
 			switch(paramAKcom)
 			{
 				case 1 : case 3 : 
-					if ((p->PR1[3]&0x0004)&&(p->PR1[5]&0x0004)) p->to_MO3.toAK.kzv=0;	break;
-//					if (p->PR1[3]&0x0004) p->to_MO3.toAK.kzv=0;	break;
+//					if ((p->PR1[3]&0x0004)&&(p->PR1[5]&0x0004)) p->to_MO3.toAK.kzv=0;	break;
+					if (p->PR1[3]&0x0004) p->to_MO3.toAK.kzv=0;	break;
 				case 2 : 		  
 					if ((p->PR1[3]&0x0004)&&(p->PR1[5]&0x0006)) p->to_MO3.toAK.kzv=0;	break;
 //					if (p->PR1[3]&0x0004) p->to_MO3.toAK.kzv=0;	break;

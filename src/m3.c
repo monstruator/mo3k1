@@ -144,14 +144,16 @@ for(;;)//----- CEPBEP -----//
 		p->pr1_c++;
 		for(i=0;i<8;i++) p->PR1[i]=dev->tx_B[10+i];
 		//for(i=3;i<7;i++) printf(" %d=%04x",i,dev->tx_B[10+i]);printf(" from\n");
-		//for(i=3;i<7;i++) printf(" %d=%x",i,toPR1[i]);printf(" to\n");
+		for(i=3;i<7;i++) printf(" %d=%x",i,toPR1[i]);printf(" to\n");
 		//for(i=0;i<1;i++) printf("from   %d",p->PR1[i]);
 	
 		if (!ispr->mo1k) 
 		{	
-			p->PR1[4]=p->PR1[4]|0x00ff; //новые исправности 
-			p->PR1[4]=p->PR1[4]|0x0100; //ОС комп
-			//p->PR1[3]=p->PR1[3]&0x0FFF; //ОС комп
+			p->PR1[4]=p->PR1[4]|0x00ff; //новые Васины исправности 
+			
+			p->PR1[4]=p->PR1[4]|0x0f00; //ОС комп
+			if (p->PR1[4]&0x8000) p->PR1[4]=p->PR1[4]|0xf000; //TVK
+			//p->PR1[3]=p->PR1[3]|0xf800; //ОС комп
 		}
 		p->to_MO3.to42.Ms1=p->PR1[3];   //состояние прибора 1.0
 		p->to_MO3.to42.Ms2=p->PR1[4];
@@ -204,9 +206,9 @@ for(;;)//----- CEPBEP -----//
 	case 6://--- npueMHuk CEB ---//
 		SIMF[4]++; //есть  ModB
 		if (SIMF[4]==60000) SIMF[2]=0;			
-		if(ou_read(dev,CEB,nogAgpecCEB)){owu6ka|=64;break;}
-		if((dev->tx_B[3])!=6){owu6ka|=128;break;}
-		for(j=0;j<6;j++)DCEB[j]=dev->tx_B[4+j]; //--- npueM CEB
+		//if(ou_read(dev,CEB,nogAgpecCEB)){owu6ka|=64;break;}
+		//if((dev->tx_B[3])!=6){owu6ka|=128;break;}
+		//for(j=0;j<6;j++)DCEB[j]=dev->tx_B[4+j]; //--- npueM CEB
 
 		//for(j=0;j<6;j++)printf("CEB=%x",DCEB[j]); //--- npueM CEB
 		break;//--- end npueMHuk CEB ---//
@@ -216,15 +218,16 @@ for(;;)//----- CEPBEP -----//
 		if (SIMF[2]==60000) SIMF[2]=0;		
 		i=Read_ModB(); //читаем данные из Мод Б
 		//if (i!=48) break; //если не целый пакет - выход
+		//printf("nk=%x sev=%x\n",Din_ModB[2],Din_ModB[4]);
 		if (Din_ModB[1]==0) ispr->nkB=1; //признак наличия навигации в Мод Б
 		else {
 				ispr->nkB=0; //навигац Мод Б исправна
 			    if (ispr->nkA==1) //если нет навигации в Мод А
 					for(j=0;j<15;j++) p->Dout41[j]=Din_ModB[j+2]; //используем из Б
 			 }		
-		if (Din_ModB[24]==0) ispr->sevB=ispr->sevB=1; //признак наличия СЕВ в Мод Б
+		if (Din_ModB[2]==0) ispr->sevB=1; //признак наличия СЕВ в Мод Б
 		else {
-				ispr->sevB=ispr->sevB=0; //навигац Мод Б исправна
+				ispr->sevB=0; //навигац Мод Б исправна
 			    p->Dout41[30]=(Din_ModB[20]>>8)&0x000F;
 				p->Dout41[30]+=(Din_ModB[20]>>12)*10;     //hours
 				p->Dout41[31]=(Din_ModB[21]>>8)&0x000F;
@@ -233,7 +236,8 @@ for(;;)//----- CEPBEP -----//
 				p->Dout41[32]+=((Din_ModB[21]>>4)&0x000f)*10; //seconds
 			 }			 
 		
-		printf("ModB - ");	for(j=0;j<30;j++) printf("%x ",Din_ModB[j+2]);printf("\n");
+		//printf("ModB - ");	for(j=0;j<3;j++) printf("%x ",Din_ModB[j]);printf("\n");
+		//ispr->nkB=ispr->sevB=0;//временно
 		break;
 	case 12://обработчик таймера (10 Гц) 
 		N_TIMER++;//счетчик тиков 
@@ -246,14 +250,14 @@ for(;;)//----- CEPBEP -----//
 			if (TIMER10<10) 
 			{
 				ispr->mo1k=0; //есть пр1.0
-				p->to_MO3.to42.Ms1=0;   //состояние прибора 1.0
-				p->to_MO3.to42.Ms2=0;
-				p->to_MO3.to42.Ms3=0;
+				//p->to_MO3.to42.Ms1=0;   //состояние прибора 1.0
+				//p->to_MO3.to42.Ms2=0;
+				//p->to_MO3.to42.Ms3=0;
 			}
 			else ispr->mo1k=1; //нет пр1.0 
 
 			
-			printf("1=%x 2=%x 3=%x\n",p->to_MO3.to42.Ms1,p->to_MO3.to42.Ms2,p->to_MO3.to42.Ms3);			
+			//printf("1=%x 2=%x 3=%x\n",p->to_MO3.to42.Ms1,p->to_MO3.to42.Ms2,p->to_MO3.to42.Ms3);			
 			//printf("H=%d M=%d S=%d T41=%d T31=%d \n",p->Dout41[30],p->Dout41[31],p->Dout41[32],p->from_MO3.from41.T_SS,p->Dout41[30]*3600+p->Dout41[31]*60+p->Dout41[32]);			
 			//printf("navi=%d jump=%d \n",p->no_navi,p->jump);
 			
@@ -382,11 +386,11 @@ for(;;)//----- CEPBEP -----//
 			}
 				//-------------------------------------------------------------
 			TIMER41=0;
-			if (SIMF[1]<SIMF[0]) ispr->nkA=ispr->nkB=0; //есть симф A
-			else ispr->nkA=ispr->nkB=1; //нет симф 
+			if (SIMF[1]<SIMF[0]) ispr->nkA=0; //есть симф A
+			else ispr->nkA=1; //нет симф 
 			SIMF[1]=SIMF[0];
  			if (SIMF[3]<SIMF[2]) ispr->cvsB=0; //есть 
-			else ispr->cvsB=ispr->sevB=ispr->nkB=1; //нет модБ,СЕВ,НК
+			else ispr->cvsB=1; //нет модБ,СЕВ,НК
 			SIMF[3]=SIMF[2];
 			if (SIMF[5]<SIMF[4]) ispr->sevA=0; //есть сев A
 			else ispr->sevA=1; //нет 
@@ -394,7 +398,7 @@ for(;;)//----- CEPBEP -----//
 
 			if ((ispr->nkA==1)&&(ispr->nkB==1)) p->Dout41[24]=0;
 			else p->Dout41[24]=1;
-  			//printf("ispr=%x simf=%x \n",p->to_MO3.to42.Mispr,p->Dout41[24]);
+  			//printf("ispr=%x \n",p->to_MO3.to42.Mispr);
 			//printf("n_k=%d \n",p->num_com);
 			//printf("jmp=%d \n",p->jump);
 			//printf("ISPR=%x sevB=%x\n",p->to_MO3.to42.Mispr,p->Dout41[24]);

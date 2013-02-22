@@ -116,6 +116,7 @@ if(regim_ou(dev,HK,AgpecHK,true)==-1) printf("Error OU HK\n");
 if(regim_ou(dev,CEB,AgpecCEB,true)==-1) printf("Error OU CEB\n"); 
 
 Dout[0]=0xba;
+for(i=1;i<24;i++) Dout[i]=0;
 
 //----- Ожидание сообщений по МК и запросов по RS
 for(;;)//----- CEPBEP -----//
@@ -135,10 +136,12 @@ switch(s)
 {
   case 1://--- npueMHuk HK ---//
 	if(ou_read(dev,HK,nogAgpecHK)) {break;} //ошибка чтения
-	if((dev->tx_B[3])!=15) {break;}			//кол-во слов != 15
-	for(j=0;j<15;j++) Dout[2+j]=dev->tx_B[4+j]; //--- npueM HK
+//	if((dev->tx_B[3])!=15) {break;}			//кол-во слов != 15
+//	for(j=0;j<15;j++) Dout[2+j]=dev->tx_B[4+j]; //--- npueM HK
 	errHK=0; Dout[1]=1; //есть симфония
 //	printf("Симфония\n");
+//	for(i=0;i<3;i++) printf(" %02x",Dout[i]); printf("\n");
+
 	break;//--- end npueMHuk HK ---//
 
   case 2: break; // HEBEPEH proxy HK
@@ -149,18 +152,21 @@ switch(s)
 
   case 4: //--- npueMHuk CEB ---//
 	if(ou_read(dev,CEB,nogAgpecCEB)) {break;} //ошибка чтения
-	if((dev->tx_B[3])!=6) {break;}			 //кол-во слов != 6
-	for(j=0;j<6;j++) Dout[18+j]=dev->tx_B[4+j]; //--- npueM CEB
-	errCEB=0; Dout[17]=1;
-	printf("СЕВ\n");
+//	if((dev->tx_B[3])!=6) {break;}			 //кол-во слов != 6
+//	for(j=0;j<6;j++) Dout[18+j]=dev->tx_B[4+j]; //--- npueM CEB
+	errCEB=0; Dout[2]=1;
+//	printf("СЕВ\n");
 	break; //--- end npueMHuk CEB ---//
 
   case 5:case 6: break; // HEBEPEH proxy CEB
 
   case 7: //--- по таймеру
+	for(i=0;i<4;i++) printf(" %x",Dout[i]); 
+//	printf(" errNK=%x errSEV=%x",errHK,errCEB);
+	printf("\n");
 	errHK++; errCEB++;
 	if(errHK>5) Dout[1]=0;
-	if(errCEB>5) Dout[17]=0;
+	if(errCEB>5) Dout[2]=0;
 	break; 
 
   case 8: //--- запрос от ЦВС3.1-A
@@ -176,12 +182,14 @@ switch(s)
 		//Передача данных в канал 1 ПЦС
 		wr_cpcs_s.type=5;
 		wr_cpcs_s.cnl=1;
-		wr_cpcs_s.cnt=48;
+		wr_cpcs_s.cnt=4; //48
 //		for(i=0;i<24;i++) {wr_cpcs_s.uom.dt[i*2]=Dout[i]&0xff;
 //						   wr_cpcs_s.uom.dt[i*2+1]=(Dout[i]>>8)&0xff;}
-		memcpy(&wr_cpcs_s.uom.dt, &Dout, sizeof(Dout));
+//		memcpy(&wr_cpcs_s.uom.dt, &Dout, sizeof(Dout));
+		for(i=0;i<4;i++) wr_cpcs_s.uom.dt[i]=Dout[i];
+
 		Send(pid_drv,&wr_cpcs_s,&wr_cpcs_r,sizeof(wr_cpcs_s),sizeof(wr_cpcs_r));
-//		for(i=0;i<48;i++) printf(" %02x",wr_cpcs_s.uom.dt[i]); printf("\n");
+		//for(i=0;i<4;i++) printf(" %02x",wr_cpcs_s.uom.dt[i]); printf("\n");
 	}
 	break; 
 

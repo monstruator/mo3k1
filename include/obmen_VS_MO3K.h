@@ -90,6 +90,7 @@ unsigned int DPL_2,
 		unsigned int cvsB : 1;
 		unsigned int k1 : 1;
 		unsigned int k2 : 1;
+
 		unsigned int nkA : 1;
 		unsigned int nkB : 1;
 		unsigned int sevA : 1;
