@@ -115,7 +115,7 @@ typedef struct
     obmen_MO3K_MO3_t  to_MO3;		
 	unsigned short PR1[8];//данные первого прибора
 	unsigned short toPR1[8];//данные для пр. 1.0
-	unsigned short Dout41[50];
+	unsigned short Dout41[60];
 	simfonia41_t	simfonia41;		//навигационные данные обновляются 2гц
 
 }SHMEM_31;

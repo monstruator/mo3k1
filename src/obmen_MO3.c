@@ -102,15 +102,6 @@ while(1)
 
     memcpy(&p->from_MO3,&bufi[4],sizeof(obmen_MO3_MO3K_t)); 
 	//выбор управляюще1 команды
-	if (p->from_MO3.from41.cr_com!=cr_com41) 
-	{
-		p->num_com=p->from_MO3.from41.num_com;
-		cr_com41=p->from_MO3.from41.cr_com;
-		p->M[0]=0x0000;
-		p->M[1]=0x000e;
-		p->M[2]=0x0000;
-		p->M[3]=0x8410;		
-	}
 	if (p->from_MO3.from42.cr_com!=cr_com42) 
 	{
 		printf(" New Command 4.2 = %d  cr_com = %d\n",
@@ -152,7 +143,7 @@ while(1)
 							case 2:	case 3: paramAKcom=3;break; 
 							case 4: case 5: 
 							case 6:	case 7: 
-							case 8: case 9: paramAKcom=1;break;
+							case 8: case 9: paramAKcom=4;break;
 						}
 						break;
 			case 292 : 	switch(p->from_MO3.fromAK.a_params[0])
@@ -174,9 +165,20 @@ while(1)
 			case 1 : p->M[3]=0x8410;printf("M=1\n");break;
 			case 3 : p->M[3]=0xC430;printf("M=3\n");break;
 			case 2 : p->M[3]=0x9450;printf("M=2\n");break;
+			case 4 : p->M[3]=0xC410;printf("M=4\n");break;
 		}
 	}
 
+	if (p->from_MO3.from41.cr_com!=cr_com41) 
+	{
+		p->num_com=p->from_MO3.from41.num_com;
+		cr_com41=p->from_MO3.from41.cr_com;
+		p->M[0]=0x0000;
+		p->M[1]=0x000e;
+		p->M[2]=0x0000;
+		p->M[3]=0x8410;		
+		printf(" New Command 4.1 = %d\n",p->num_com);
+	}
 	
 	//printf("V=%d\n",V);
 	//printf("V=%f\n",p->from41.Vr);
@@ -333,7 +335,7 @@ while(1)
 			printf("paramAKcom=%d\n",paramAKcom);
 			switch(paramAKcom)
 			{
-				case 1 : case 3 : 
+				case 1 : case 3: case 4: 
 //					if ((p->PR1[3]&0x0004)&&(p->PR1[5]&0x0004)) p->to_MO3.toAK.kzv=0;	break;
 					if (p->PR1[3]&0x0004) p->to_MO3.toAK.kzv=0;	break;
 				case 2 : 		  
