@@ -87,8 +87,8 @@ void main( int argc, char *argv[] )
 	SREDN = floatSUM_4/f;
 	printf("измерен уровень шума %3.3e \n",SREDN);			
 
-	printf("Уствновлены пороги по алг Авдеева\n");			
-//	writePorogs(SREDN*31.6, SREDN*2);
+//	printf("Уствновлены пороги по алг Авдеева\n");			
+	writePorogs(1e2, SREDN*2);
 	
     timer.it_value.tv_sec     = 3L; //start after X sec
     timer.it_value.tv_nsec    = 0L;
@@ -126,13 +126,13 @@ void main( int argc, char *argv[] )
 			{
 				case 0 : Write_K1(SUM4); break;
 				case 1 : Write_K1(ZI); break;
-				//case 2 : Write_K1(SUM20); break;
+				case 2 : Write_K1(SUM20); break;
 				case 3 : Write_K1(YP); break;
 				case 4 : Write_K1(RAZN0); break;
 				case 5 : Write_K1(RAZN1); break;
-				//case 4 : Write_K1(DPL1); break;						
+				case 7 : Write_K1(DPL1); break;						
 				case 9 : //раз в пол сек выполняем сервисные операции
-						if (p->U.SUM_4>1e+8) p->U.SUM_20=(log10(p->U.SUM_4)-8)*16;	else p->U.SUM_20=0;
+						if (p->U.SUM_4>1e+6) p->to_MO3.to41.UR_sign_K1=(short)((log10(p->U.SUM_4)-6)*16);	else p->to_MO3.to41.UR_sign_K1=0;
 						if ((p->num_com!=6)&&(abs(p->from_MO3.from41.Fd*1000-Dopler1) > 35000)) 
 						{
 							Dopler1=(float)p->from_MO3.from41.Fd*1000;
@@ -146,24 +146,14 @@ void main( int argc, char *argv[] )
 							Dpl_42=p->from_MO3.from42.Fd;
 							printf("d_from41=%e\n",p->from_MO3.from42.Fd);
 						}
-						sum20[count20]=p->U.SUM_20;
-						count20++;
-						if (count20==7) count20=0;
-						p->U.SUM_20=0;
-						for(i=0;i<9;i++) p->U.SUM_20+=sum20[i]/8;
 
 						//printf("lvl = %f data=%d\n",p->U.SUM_20,data_count);
 						//printf("n_com_from_k1 = %x \n",p->num_com);
-						//printf("SUM_4=%3.3e  	SUM_20=%3.3e 	DPL=%d hz\n",p->U.SUM_4,p->U.SUM_20,p->U.DPL_1*244);
+						printf("SUM_4=%3.3e  	SUM_20=%3.3e 	DPL=%d hz\n",p->U.SUM_4,p->U.SUM_20,p->U.DPL_1*244);
 					
 						//printf("OI=%x c_OI=%x\n",p->U.OI,p->U.c_OI);				
 						//printf("ZI_DATA=%x	 ZI_DOST=%x\n",p->U.ZI_DATA,p->U.ZI_DOST);
 
-//						if(m_porog[0]==p->U.SUM_4) i2++;else i2=0;
-//						if (i2>3) p->U.SUM_20=i2=0; 
-//						m_porog[0]=p->U.SUM_4;
-						if(m_porog[0]==p->U.SUM_4) {p->U.SUM_20=0;} 
-						m_porog[0]=p->U.SUM_4;
 						break;
 			}
 

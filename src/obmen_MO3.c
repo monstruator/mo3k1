@@ -68,7 +68,7 @@ float 	C1,C2,C3,C4,C5,C6,C7,C8;
 unsigned short cr_com; //порядковый номер предыдущей команды
 		short		V,dV;
 int cnt=0;
-int i1=0;
+int i1=0,i2;
 int rez;
 unsigned short buf[4];
 float Angle0;
@@ -216,10 +216,10 @@ while(1)
 		else p->to_MO3.to41.Fd_FACT=-(float)0.24414*p->U.DPL_1;
 	//printf("d=%d\n",p->U.DPL_1);
 
-	p->to_MO3.to41.UR_sign_K1=(short)p->U.SUM_20;	
+	//p->to_MO3.to41.UR_sign_K1=(short)p->U.SUM_20;	
 	if (p->to_MO3.to41.UR_sign_K1>17) p->to_MO3.to41.PrM_K1=1;else p->to_MO3.to41.PrM_K1=0;
 
-//	printf(" Angle_Pr1 b=%4.3f q=%4.3f   \n",p->to_MO3.to41.beta_FACT*57.3,p->to_MO3.to41.P_FACT*57.3);
+//	printf("                                Angle_Pr1 b=%4.3f q=%4.3f   \n",p->to_MO3.to41.beta_FACT*57.3,p->to_MO3.to41.P_FACT*57.3);
 //	printf(" Angle_PR4 = %4.3f %4.3f\n",p->from_MO3.from41.beta*57.3,p->from_MO3.from41.P_ANT*57.3);
 //	printf("					 P_ANT = %4.3f", p->from_MO3.from41.P_ANT*57.3);
 //	printf(" P_FACT = %4.3f  com42=%d \n",p->to_MO3.to41.P_FACT*57.3,p->from42.num_com);
@@ -228,7 +228,7 @@ while(1)
 	//printf("Angl 2=%02f r=%f NK%d  \n",from41.P_ANT,p->to_MO3.to41.P_FACT,from41.num_com);
 
 	//Готовность к сеансу связи
-	if (p->num_com==1) i1++; //считаем время от первой ком нач сеанса
+	if (p->num_com==1) i2++; //считаем время от первой ком нач сеанса
 	if ((gloria_start==0)&&((p->num_com==1)||(p->num_com==2)))
 	{
 		if ((p->from_MO3.from41.Nkey_SHAKR<=31)&&(p->from_MO3.from41.Nkey_SHAKR>=0)) 
@@ -247,8 +247,7 @@ while(1)
 			gloria_count=0;
 		}
 	}
-
-	if (i1>30) 	{p->to_MO3.to41.pr_GSS=1;i1=0;}
+	if (i2>30) 	{p->to_MO3.to41.pr_GSS=1;i2=0;}
 	if (p->num_com==3) gloria_start=0;
 	///printf("GSS=%d ",p->to_MO3.to41.pr_GSS);
 

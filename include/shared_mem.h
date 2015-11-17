@@ -2,7 +2,7 @@
  #include "obmen_VS_MO3K.h"
  #define MAX_SHMEM_COUNT 20
 
-#define  SHMEM_NAME  "PR31v9" //z
+#define  SHMEM_NAME  "PR31v10" //z
 #define  SHMEM_t  SHMEM_31
 
 SHMEM_31 *p;      

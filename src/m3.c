@@ -67,9 +67,9 @@ int TIMESEV,setANT=0,minus_x;
 	double x,y,x1,y1,C,S,ri,r1,r2,r3,
 	x2=0,y2=0;//дельты по качкам
 	double prim,primq,primcos;
-float KK=0;  //курс корабля
+float KK=0,KK1=0;  //курс корабля
 //const AgpecHK=28,AgpecCEB=31,nogAgpecHK=0,nogAgpecCEB=0;// agpeca OY
-const AgpecHK=28,AgpecCEB=18,nogAgpecHK=0,nogAgpecCEB=0;// agpeca OY ???(CEB=17,18)
+const AgpecHK=18,AgpecCEB=18,nogAgpecHK=0,nogAgpecCEB=0;// agpeca OY ???(CEB=17,18)
 const Ynp_np1=1,HK=2,CEB=0;// No KAH MK
 const Cnp1=1,CK1=Cnp1+8,CK2=CK1+20;//cMeweHue gaHHblx B Dout
 const Cq=16,C42np1=10;//cMeweHue gaHHblx B Dout
@@ -145,7 +145,7 @@ for(;;)//----- CEPBEP -----//
 		for(i=0;i<8;i++) p->PR1[i]=dev->tx_B[10+i];
 		//for(i=3;i<7;i++) printf(" %d=%04x",i,dev->tx_B[10+i]);printf(" from\n");
 		//for(i=3;i<7;i++) printf(" %d=%x",i,toPR1[i]);printf(" to\n");
-		//for(i=0;i<1;i++) printf("from   %d",p->PR1[i]);
+		//for(i=0;i<3;i++) printf(" %d",p->PR1[i]);
 	
 		if (!ispr->mo1k) 
 		{	
@@ -165,7 +165,7 @@ for(;;)//----- CEPBEP -----//
 
 		//ANGLE
 	    memcpy(&byta2,&p->Dout41[0],2);	 Flt=byta2*pi/(1<<14); p->simfonia41.Kg=Flt;// printf("Kypc=%8.4f \n",Flt);
-		p->to_MO3.to41.P_FACT=(p->Dout41[16]-1991)*2/RADtoGRAD+p->simfonia41.Kg+x2;//Азимут+курс
+		p->to_MO3.to41.P_FACT=(p->Dout41[16]-1991)*2/RADtoGRAD+KK+x2;//Азимут+курс
 
 		if (p->to_MO3.to41.P_FACT<0) p->to_MO3.to41.P_FACT+=2*pi;//Азимут+курс
 		if (p->to_MO3.to41.P_FACT>2*PI) p->to_MO3.to41.P_FACT-=2*pi;//Азимут+курс
@@ -173,7 +173,8 @@ for(;;)//----- CEPBEP -----//
 		if (p->Dout41[18]&0x800) p->to_MO3.to41.beta_FACT=(360-p->Dout41[18]/C2)/C3; //УГОЛ МЕСТА
 			else p->to_MO3.to41.beta_FACT=-p->Dout41[18]/C1;
 		p->to_MO3.to41.beta_FACT+=y2;
-		//printf("x2=%3.3e y2=%3.3e\n",x2,y2);
+		//printf(" x2=%f y2=%f ",x2*57.32,y2*57.32);
+		//printf("\n");
 		TIMER10=0;//был обмен с пр1.0
 		break;
 	case 2://--- ОШИБКА ОБМЕНА С ПР1
@@ -184,28 +185,39 @@ for(;;)//----- CEPBEP -----//
 		if (SIMF[0]==60000) SIMF[0]=0;
 		if(ou_read(dev,HK,nogAgpecHK)){owu6ka|=8;break;}
    		if((dev->tx_B[3])!=32)  {owu6ka|=512;printf("error=%d\n",dev->tx_B[3]);break;}
+   		if((dev->tx_B[1])!=0x12)  break;
 		//printf("%d\n",dev->tx_B[3]);
     	for(j=0;j<15;j++) p->Dout41[j]=dev->tx_B[4+j]; //--- npueM HK
 		//printf("N=%d",SIMF[0]);
 //		printf("ModA simf- "); 	for(j=0;j<15;j++) printf("%x ",p->Dout41[j]);printf("\n");
+//		printf("ModA simf- "); 	for(j=0;j<15;j++) printf("%x ",dev->tx_B[j]);printf("\n");
 		//printf("%x\n",p->Dout41[4]);
 
-	    memcpy(&b2,&p->Dout41[5],2);	 KK=b2*pi/(1<<14);
-		//printf("%f\n",KK);
+	    //memcpy(&b2,&p->Dout41[5],2);	 KK=b2*pi/(1<<14);
+	    KK=p->Dout41[5]*pi/(1<<14);
+		KK=KK+pi; if (KK>2*pi) KK=KK-2*pi; //переворот с кормы в нос
+		
+	//	printf("KK=%f ",KK);
 
 		//КАЧКИ
-		if (p->Dout41[3]&0x8000) PSI=-(p->Dout41[4])*NAVtoRAD/4;
-		    else PSI=(float)p->Dout41[4]*NAVtoRAD/4;
+//		if (p->Dout41[3]&0x8000) PSI=-(p->Dout41[3])*NAVtoRAD/4;
+//		    else PSI=(float)p->Dout41[4]*NAVtoRAD/4;
+//		if (p->Dout41[1]&0x8000) TETA=-(p->Dout41[2])*NAVtoRAD/4;
+//		    else TETA=(float)p->Dout41[2]*NAVtoRAD/4;
 
-		if (p->Dout41[1]&0x8000) TETA=-(p->Dout41[2])*NAVtoRAD/4;
-		    else TETA=(float)p->Dout41[2]*NAVtoRAD/4;
+		if (p->Dout41[1]&0x8000) PSI=-(0xffff-p->Dout41[1])*pi/(1<<14);
+		    else PSI=p->Dout41[1]*pi/(1<<14);
+
+		if (p->Dout41[3]&0x8000) TETA=-(0xffff-p->Dout41[3])*pi/(1<<14);
+		    else TETA=p->Dout41[3]*pi/(1<<14);
 
 //			if (dev->tx_B[6]==0x8000) PSI=0;
 //			if (dev->tx_B[7]==0x8000) TETA=0;
 
-		if (abs(PSI)>1/4)  PSI=oldPSI;
-		if (abs(TETA)>1/4) TETA=oldTETA;
-//		printf("PSI=%f TETA=%f\n",PSI,TETA);
+	//	if (abs(PSI)>1/4)  PSI=oldPSI;
+	//	if (abs(TETA)>1/4) TETA=oldTETA;
+	//	printf(" TETA=%f(%f) PSI=%f(%f)\n",PSI,PSI*57.32,TETA,TETA*57.32);
+	//	printf(" A_simf "); 	for(j=0;j<9;j++) printf("%04x ",p->Dout41[j]);printf("\n");
 		
   		break;
 	case 4:owu6ka|=32;break; // HEBEPEH proxy HK
@@ -215,11 +227,12 @@ for(;;)//----- CEPBEP -----//
 	case 6://--- npueMHuk CEB ---//
 		SIMF[4]++; //есть  ModB
 		if (SIMF[4]==60000) SIMF[2]=0;			
-		//if(ou_read(dev,CEB,nogAgpecCEB)){owu6ka|=64;break;}
+		if(ou_read(dev,CEB,nogAgpecCEB)){owu6ka|=64;break;}
 		//if((dev->tx_B[3])!=6){owu6ka|=128;break;}
-		//for(j=0;j<6;j++)DCEB[j]=dev->tx_B[4+j]; //--- npueM CEB
+		for(j=0;j<6;j++) p->CEB[j]=dev->tx_B[4+j]; //--- npueM CEB
 
-		//for(j=0;j<6;j++)printf("CEB=%x",DCEB[j]); //--- npueM CEB
+		//for(j=0;j<6;j++) printf(" %x",p->CEB[j]);printf("\n"); //--- npueM CEB
+		//printf("%02x:%02x:%02x ", p->CEB[2]>>8,p->CEB[3]>>8,p->CEB[3]&0x00ff);printf("\n");
 		break;//--- end npueMHuk CEB ---//
 	case 7:case 8:owu6ka|=256;break; // HEBEPEH proxy CEB
 	case 9:   //Обмен с МодБ 
@@ -227,7 +240,7 @@ for(;;)//----- CEPBEP -----//
 		if (SIMF[2]==60000) SIMF[2]=0;		
 		i=Read_ModB(); //читаем данные из Мод Б
 		//if (i!=48) break; //если не целый пакет - выход
-		//printf("nk=%x sev=%x\n",Din_ModB[2],Din_ModB[4]);
+		//printf("nk=%x sev=%x\n",Din_ModB[1],Din_ModB[2]);
 		if (Din_ModB[1]==0) ispr->nkB=1; //признак наличия навигации в Мод Б
 		else {
 				ispr->nkB=0; //навигац Мод Б исправна
@@ -277,35 +290,35 @@ for(;;)//----- CEPBEP -----//
 			if (p->num_com==1) //подготовка к сеансу связи
 			{
 				//=0;
-			    memcpy(&b2,&p->Dout41[5],2);	 KK=b2*pi/(1<<14);
-				if (p->no_navi==1) KK=1.218; //printf("navi=%d\n",p->no_navi);
-				KK=p->from_MO3.from41.P_ANT_1-KK;
-				if ((KK>pi/2)&&(p->from_MO3.from41.P_ANT_2>p->from_MO3.from41.P_ANT_1)) p->jump=-1;
-					else if ((KK<-pi/2)&&(p->from_MO3.from41.P_ANT_2<p->from_MO3.from41.P_ANT_1)) p->jump=1;
+			    //memcpy(&b2,&p->Dout41[5],2);	 KK=b2*pi/(1<<14);
+				//if (p->no_navi==1) KK=1.218; //printf("navi=%d\n",p->no_navi);
+				KK1=p->from_MO3.from41.P_ANT_1-KK;
+				if ((KK1>pi/2)&&(p->from_MO3.from41.P_ANT_2>p->from_MO3.from41.P_ANT_1)) p->jump=-1;
+					else if ((KK1<-pi/2)&&(p->from_MO3.from41.P_ANT_2<p->from_MO3.from41.P_ANT_1)) p->jump=1;
 
-				if (KK>4.71225)  p->jump=-1;	
-				if (KK<-4.71225) p->jump=1;
+				if (KK1>4.71225)  p->jump=-1;	
+				if (KK1<-4.71225) p->jump=1;
 
-				KK=KK+2*p->jump*pi;
-				oldKK=KK; //сохраним установленный азимут
+				KK1=KK1+2*p->jump*pi;
+				oldKK=KK1; //сохраним установленный азимут
 	    		if (p->from_MO3.from41.beta_1>=0)	p->toPR1[2]=-p->from_MO3.from41.beta_1*C1;//Угол места
 			    else p->toPR1[2]=(360+(-p->from_MO3.from41.beta_1*C3))*C2;//
-				p->toPR1[0]=KK*RADtoGRAD/2+1991;//Азимут
+				p->toPR1[0]=KK1*RADtoGRAD/2+1991;//Азимут
 				oldKOD=p->toPR1[0];//сохранение кода угла	
 				setANT=1;//была настройка углов перед сеансом
 			}
 			else
 			if (p->num_com==2) //сеанс связи начался
 			{
-			    memcpy(&b2,&p->Dout41[5],2);	 KK=b2*pi/(1<<14);	
-				if (p->no_navi==1) KK=1.218; //printf("navi=%d\n",p->no_navi);
-				KK=p->from_MO3.from41.P_ANT-KK;
-				KK=KK+2*p->jump*pi;
+			    //memcpy(&b2,&p->Dout41[5],2);	 KK=b2*pi/(1<<14);	
+				//if (p->no_navi==1) KK=1.218; //printf("navi=%d\n",p->no_navi);
+				KK1=p->from_MO3.from41.P_ANT-KK;
+				KK1=KK1+2*p->jump*pi;
 				
-				if (KK>2*PI) KK=KK-2*PI;
-				if (KK<-2*PI) KK=KK+2*PI;
+				if (KK1>2*PI) KK1=KK1-2*PI;
+				if (KK1<-2*PI) KK1=KK1+2*PI;
 //!!!
-				x=(double)KK;	
+				x=(double)KK1;	
 				if (x<0) {x+=2*PI;minus_x=1;} else minus_x=0;
 				y=(double)p->from_MO3.from41.beta;
 		//		PSI=(double)i*rad;		
@@ -325,19 +338,21 @@ for(;;)//----- CEPBEP -----//
 				//printf(" x0=%3.1f y0=%3.1f PSI=%3.1f TETA=%3.1f x1=%3.1f y1=%3.1f\n",
 				//KK*grad,y*grad,PSI*grad,TETA*grad,x1*grad,y1*grad);
 				
-				KK=x1;
+				KK1=x1;
 
 				oldKOD=p->PR1[0];
 				oldKK=(oldKOD-1991)/325.94915;//Азимут установленный	
 
-				if (KK!=oldKK)
+				if (KK1!=oldKK)
 				{
-					deltaKK=KK-oldKK;
+					deltaKK=KK1-oldKK;
 
 					//if (deltaKK>0) deltaKK-=0.01;else deltaKK+=0.01;  
 					
-					if (deltaKK>5) {deltaKK-=2*pi;printf("-\n");}  
-					if (deltaKK<-5) {deltaKK+=2*pi;printf("+\n");}
+					if (deltaKK>5) {deltaKK-=2*pi;}//printf("-\n");}  
+					if (deltaKK<-5) {deltaKK+=2*pi;}//printf("+\n");}
+					if (deltaKK>5) {deltaKK-=2*pi;}//printf("-\n");}  
+					if (deltaKK<-5) {deltaKK+=2*pi;}//printf("+\n");}
 
 					//deltaKK=deltaKK*RADtoGRAD/2;
 					deltaKOD=(short)(deltaKK*RADtoGRAD/2);
@@ -363,24 +378,24 @@ for(;;)//----- CEPBEP -----//
 			{	//управление пр. 1.0 из 4.2
 				//Углы
 				//printf("Az%f Um=%f\n",p->from_MO3.from42.q,p->from_MO3.from42.beta);
-			    memcpy(&b2,&p->Dout41[5],2);	 KK=b2*pi/(1<<14);	
-				KK=p->from_MO3.from42.q-KK;//Азимут
-
+			    //memcpy(&b2,&p->Dout41[5],2);	 KK=b2*pi/(1<<14);	
+				KK1=p->from_MO3.from42.q;//-KK;//Азимут
+				
 				if (p->from_MO3.from42.Rejim_AS==1) //режим АС
 				{
-					printf("lvl = %f r0 = %f ",p->U.SUM_20,p->U.RAZN_0);
+					//printf("lvl = %f r0 = %f ",p->U.SUM_20,p->U.RAZN_0);
 					p->to_MO3.to42.pr_rejim_AS=1;
 					if ((p->U.SUM_20>30)&&(abs(p->U.RAZN_0<1.1)))	
 						A1=-p->U.RAZN_0*31.48;
 					else	A1=0;
 					p->toPR1[0]=(p->PR1[0]&0x0fff)+A1;
-					printf("Pr1=%d A1=%d newPr1+%d\n",p->PR1[0]&0x0fff,A1,p->toPR1[0]);
+					//printf("Pr1=%d A1=%d newPr1+%d\n",p->PR1[0]&0x0fff,A1,p->toPR1[0]);
 				}
 				else //если не АС
 				{
-					if (KK==0)
+					if (KK1==0)
 					{
-//						printf("PSI=%f TETA=%f\n",PSI,TETA);
+//						//printf("PSI=%f TETA=%f\n",PSI,TETA);
 
 						beta1=p->from_MO3.from42.beta-TETA;
 						if (beta1>=0)	p->toPR1[2]=-beta1*C1;//Угол места
@@ -390,7 +405,7 @@ for(;;)//----- CEPBEP -----//
 						if (alfa1>=0)	p->toPR1[1]=alfa1*C4;//KPEH
 						else p->toPR1[1]=0xFFF+(alfa1*RADtoGRAD)*12.27;
 
-						p->toPR1[0]=KK*RADtoGRAD/2+1991;//Азимут
+						p->toPR1[0]=KK1*RADtoGRAD/2+1991;//Азимут
 
 					}
 					else 
@@ -399,7 +414,8 @@ for(;;)//----- CEPBEP -----//
 						else p->toPR1[2]=(360+(-p->from_MO3.from42.beta*C3))*C2;//
 						if (p->from_MO3.from42.alfa>=0)	p->toPR1[1]=p->from_MO3.from42.alfa*C4;//KPEH
 						else p->toPR1[1]=0xFFF+(p->from_MO3.from42.alfa*RADtoGRAD)*12.27;
-						p->toPR1[0]=KK*RADtoGRAD/2+1991;//Азимут
+						p->toPR1[0]=KK1*RADtoGRAD/2+1991;//Азимут
+						//printf("			KK1=%f \n", KK1*57.32);
 					}
 				}
 				p->to_MO3.to42.pr_rejim_AS=p->from_MO3.from42.Rejim_AS;
