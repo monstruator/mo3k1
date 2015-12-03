@@ -1,0 +1,383 @@
+WATCOM Linker Version 10.6
+Copyright by WATCOM International Corp. 1985, 1996. All rights reserved.
+Created on:       13/01/16 15:12:45
+Executable Image: read_ft245
+creating a QNX 386 executable
+
+
+                        +------------+
+                        |   Groups   |
+                        +------------+
+
+Group                           Address              Size
+=====                           =======              ====
+
+DGROUP                          0000d000             00008ba0
+
+
+
+                        +--------------+
+                        |   Segments   |
+                        +--------------+
+
+Segment                Class          Group          Address         Size
+=======                =====          =====          =======         ====
+
+BEGTEXT                CODE                          0000a000        00000006
+_TEXT                  CODE                          0000a010        00002d9c
+printf11_DATA          FAR_DATA                      0000cdac        00000000
+fprintf11_DATA         FAR_DATA                      0000cdac        00000000
+fprtf11_DATA           FAR_DATA                      0000cdac        00000000
+_NULL                  BEGDATA        DGROUP         0000d000        00000020
+_AFTERNULL             BEGDATA        DGROUP         0000d020        00000002
+CONST                  DATA           DGROUP         0000d024        0000066c
+CONST2                 DATA           DGROUP         0000d690        00000104
+_DATA                  DATA           DGROUP         0000d794        00000338
+XIB                    DATA           DGROUP         0000dacc        00000000
+XI                     DATA           DGROUP         0000dacc        00000006
+XIE                    DATA           DGROUP         0000dad2        00000000
+YIB                    DATA           DGROUP         0000dad2        00000000
+YI                     DATA           DGROUP         0000dad2        00000006
+YIE                    DATA           DGROUP         0000dad8        00000000
+DATA                   DATA           DGROUP         0000dad8        00000000
+_BSS                   BSS            DGROUP         0000dad8        000000c4
+STACK                  STACK          DGROUP         0000dba0        00008000
+
+
+                        +----------------+
+                        |   Memory Map   |
+                        +----------------+
+
+* = unreferenced symbol
++ = symbol only referenced locally
+s = symbol is static
+
+Address        Symbol
+=======        ======
+
+Module: //1/home/seversk/mo3k/usb1/read_ft245.o(/home/seversk/mo3k/usb1/read_ft245.c)
+0000a010*      create_shmem_
+0000a123+      open_shmem_
+0000a241+      get_dev_info_
+0000a31c*      set_rx_timeout_
+0000a3a5+      set_latency_
+0000a41c+      get_latency_
+0000a48c*      reset_device_
+0000a5a0+      read_data_nonblock1_
+0000a8ca       main_
+0000d794+      _sum_ret
+0000d798+      _TM
+0000dad8+      _p
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(stkq32)
+0000abf9*      __STK
+0000abfd       __CHK
+0000abf6*      __GRO
+0000ac1e*      __STKOVERFLOW_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(shm_unlink)
+0000ac93       shm_unlink_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(shm_open)
+0000acac       shm_open_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(errno)
+0000acc5       __get_errno_ptr_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(strerror)
+0000acdd       strerror_
+0000dadc+      _emsg
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(printf)
+0000ad43       printf_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(ltrunc)
+0000ad65       ltrunc_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(ummap)
+0000ad7e       mmap_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(sleep)
+0000ad93+      nanosleep_
+0000ae40*      _lsleep_
+0000ae40*      sleep_
+0000ae64       delay_
+0000d79c+      ___sleep_tid
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(dev_info)
+0000aec2       dev_info_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(iob)
+0000d7a0       ___iob
+0000d980s      _force
+0000db24       ___ClosedStreams
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(fprintf)
+0000aedb       fprintf_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(qnx_ioctl)
+0000aefc       qnx_ioctl_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(nmalloc)
+0000af15       _nmalloc_
+0000af15       malloc_
+0000d984       ___nheapbeg
+0000d988       ___MiniHeapRover
+0000d98c       ___LargestSizeB4MiniHeapRover
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(fopen)
+0000b004+      __open_flags_
+0000b099s      __doopen_
+0000b146+      _fsopen_
+0000b17f       fopen_
+0000b189s      close_file_
+0000b203*      freopen_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(read)
+0000b25a       read_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(kbhitqnx)
+0000b273       kbhit_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(fwrite)
+0000b36d       fwrite_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(memcpy)
+0000b4dd       memcpy_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(nfree)
+0000b502       _nfree_
+0000b502       free_
+0000db28+      ___MiniHeapFreeRover
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(fclose)
+0000b590       fclose_
+0000b5cf       __shutdown_stream_
+0000b5e4       __doclose_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(strdup)
+0000b66d       strdup_
+0000b66d*      _strdup_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(gtopt_3s)
+0000db2cs      _errbuf
+0000d990+      _optind
+0000d994+      _opterr
+0000d998+      _optopt
+0000b6b2       getopt_
+0000d99cs      __gops
+0000db7c       _optarg
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(strtol)
+0000b71fs      _stol_
+0000b882       strtoul_
+0000b88c*      strtol_
+0000b894s      radix_value_
+0000d9bcs      _nearly_overflowing
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(open)
+0000b8f2       open_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(close)
+0000b90b       close_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(cstrtq32)
+0000d000*      __nullarea
+0000da48       __slib_func
+0000b928       _cstart_
+0000b9ce       __exit_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(cmainqnx)
+0000ba07s      __null_FPE_rtn_
+0000ba08*      _Not_Enough_Memory_
+0000ba1as      _s_EFG_printf_
+0000ba21       __CMain
+0000db80       __argc
+0000db84+      __argv
+0000db88*      ___env_mask
+0000db8c       __endheap
+0000db90       _environ
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(xmsgqnx)
+0000bae7+      __exit_with_msg_
+0000bb1c       __fatal_runtime_error_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(mainqnx)
+0000da50+      ___FirstThreadData
+0000da54       ___GetThreadPtr
+0000da58       __AccessFileH
+0000da5c       __ReleaseFileH
+0000da60*      __InitAccessH
+0000da64       __FiniAccessH
+0000da68       __AccessIOB
+0000da6c       __ReleaseIOB
+0000da70       __AccessNHeap
+0000da74*      __AccessFHeap
+0000bb39*      __threadid_
+0000bb43s      __SingleThread_
+0000bb48s      __NullAccHeapRtn_
+0000bb48s      __NullAccIOBRtn_
+0000bb48s      __NullAccessRtn_
+0000bb48s      __NullInitAccessRtn_
+0000bb49       __QNXInit_
+0000da78       __ReleaseNHeap
+0000da7c*      __ReleaseFHeap
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(__qnx_exit)
+0000bb89       __qnx_exit_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(__getmagicvar)
+0000bba2       __getmagicvar_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(__strnerr)
+0000bbbb       __strnerr_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(strcpy)
+0000bbd4       strcpy_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(strlen)
+0000bbf3       strlen_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(itoa)
+0000bc0cs      _Alphabet
+0000bc31+      utoa_
+0000bc7b       itoa_
+0000bc7b*      _itoa_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(strcat)
+0000bc96       strcat_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(fprtf)
+0000bcc9s      file_putc_
+0000bcda       __fprtf_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(crwd386)
+0000da80*      __dynend
+0000da84       __curbrk
+0000da88       __STACKLOW
+0000da8c       __STACKTOP
+0000da90*      __ASTACKSIZ
+0000da94*      __ASTACKPTR
+0000da98       __cbyte
+0000da9c*      __cbyte2
+0000daa0*      __child
+0000daa6*      __Envptr
+0000daaa*      __Envseg
+0000daa4*      __no87
+0000daac*      __FPE_handler
+0000daac       ___FPE_handler
+0000bd69s      __null_FPE_rtn
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(_mmap)
+0000bd6a       _mmap_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(getpid)
+0000bd83       getpid_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(timer_create)
+0000bd9c       timer_create_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(timer_settime)
+0000bdb5       timer_settime_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(stinit)
+0000db94       ___OpenStreams
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(memalloc)
+0000bdce       __MemAllocator
+0000be76       __MemFree
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(grownear)
+0000bf81s      __LinkUpNewMHeap_
+0000bff5+      __LastFree_
+0000c01f       __ExpandDGROUP_
+0000c115s      __AdjustAmount_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(nmemneed)
+0000c15b       __nmemneed_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(heapmod)
+0000db98       ___nheap_clean
+0000db99*      ___fheap_clean
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(tolower)
+0000c15e       tolower_
+0000c15e*      _tolower_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(seterrno)
+0000c16c*      __set_EDOM_
+0000c171       __set_errno_
+0000c17d*      __set_ERANGE_
+0000c184*      __set_EINVAL_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(sopen)
+0000c194       sopen_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(allocfp)
+0000c1ad       __allocfp_
+0000c265       __freefp_
+0000c29e       __purgefp_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(fseek)
+0000c2bcs      __update_buffer_
+0000c2f3s      __reset_buffer_
+0000c30b       fseek_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(chktty)
+0000c41f       __chktty_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(tcgetattr)
+0000c44e       tcgetattr_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(tcsetattr)
+0000c467       tcsetattr_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(kernel)
+0000c480*      __send_
+0000c4da       __sendfd_
+0000c52e*      __receive_
+0000c562*      __reply_
+0000c596*      __creceive_
+0000c5ca*      __readmsg_
+0000c604*      __writemsg_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(ioalloc)
+0000c63a       __ioalloc_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(qwritqnx)
+0000c6b1       __qwrite_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(flush)
+0000c6f9       __flush_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(ftell)
+0000c7b9       ftell_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(lseek)
+0000c80a       lseek_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(getenv)
+0000c823       getenv_
+0000c833+      _findenv_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(__getopt)
+0000c88d       __getopt_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(write)
+0000c8a6       write_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(istable)
+0000d690       __IsTable
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(segq32)
+0000c8c0       __QNXseg__
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(inirt386)
+0000c8c2       __InitRtns
+0000c90d       __FiniRtns
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(noefgfmt)
+0000c95cs      _no_support_loaded_
+0000dab0       ___EFG_printf
+0000dab4*      ___EFG_scanf
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(__setmagicvar)
+0000c96e       __setmagicvar_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(regdata)
+0000c987*      __RegisterThreadDataSize_
+0000dab8       ___ThreadDataSize
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(set386)
+0000c9a0       memset_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(amblksiz)
+0000dabc       __amblksiz
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(exit)
+0000c9b8s      _null_exit_rtn_
+0000c9b9       exit_
+0000c9d9*      _exit_
+0000dac0+      ___atexit
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(enterdb)
+0000c9de       __EnterWVIDEO_
+0000dac4+      ___WD_Present
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(fputc)
+0000ca04       fputc_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(__prtf)
+0000ca92       __prtf_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(initfile)
+0000caab       __InitFiles_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(ioexit)
+0000cb22       __full_io_exit_
+0000cb2e*      fcloseall_
+0000cb33s      docloseall_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(heapen)
+0000cb86*      _heapenable_
+0000dac8       ___heap_enabled
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(sbrk)
+0000cba7*      sbrk_
+0000cbad       __brk_
+0000cbce*      brk_
+0000cc36*      __setcbrk_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(tellqnx)
+0000cc3c       tell_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(isatty)
+0000cc4d       isatty_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(kererr)
+0000cc66       __kererr_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(fflush)
+0000cc74       fflush_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(strncmp)
+0000cc84       strncmp_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(__stos)
+0000ccb0       __STOSB
+0000cce7*      __STOSD
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(_brk)
+0000cd53       _brk_
+Module: /usr/watcom/10.6/usr/lib/clib3r.lib(flushall)
+0000cd6c       flushall_
+0000cd71*      __flushall_
+
+
+                        +--------------------+
+                        |   Libraries Used   |
+                        +--------------------+
+
+/usr/watcom/10.6/usr/lib/clib3r.lib
+
+
+                        +-----------------------+
+                        |   Linker Statistics   |
+                        +-----------------------+
+
+Stack size:  8000 (32768.)
+Memory size:  b94c (47436.)
+Entry point address: 0000b928
+Link time: 00:00.50

@@ -1,0 +1,52 @@
+#Image: /boot/sys/boot -v
+#Image: /boot/sys/Proc32 -l 1
+#Image: /boot/sys/Slib32
+#Image: /boot/sys/Slib16
+#Image: /bin/Fsys -Hdisk160
+#Image: /bin/Fsys.atapi fsys -Ndsk0 -n0=hd0. -n5=cd0.
+#Image: /bin/mount -p /dev/hd0.0 /dev/hd0.0t77 /
+#Image: /bin/sinit TERM=qnxm
+#export NODE=1
+export ABLANG=en
+export TZ=est05edt04,M4.1.0/2,M10.5.0/2
+/bin/rtc -l hw
+Dev &
+emu87 &
+Pipe &
+/bin/Dev.ser -N/dev/ser1 3f8,4 &
+#/bin/Dev.ser -N/dev/ser2 2f8,3 &
+Dev.ansi -Q -n6 &
+reopen /dev/con1
+kbd $CON_KBD
+prefix -A /dev/console=/dev/con1
+Dev.par &
+Dev.pty -n16 &
+Iso9660fsys /cd0.0=/dev/cd0.0 &
+#/bin/Fsys.floppy -a3f0 -i6
+# Define the default CD Rom
+/bin/prefix -A /cd=//0/cd0.0
+/bin/Net -d8 &
+/bin/Net.ether2100 &
+netmap -f
+nameloc &
+chkfsys /
+#Fatfsys  a=/dev/fd0 &
+if test -f /etc/config/bin/tcpip.$NODE
+then
+. /etc/config/bin/tcpip.$NODE
+fi
+if test -f /etc/config/bin/ph.$NODE
+then
+. /etc/config/bin/ph.$NODE
+else
+tinit -c "login root" -t /dev/con1 -T /dev/con[2-6] &
+#tinit -T /dev/con[2-6] &
+fi
+
+#io-usb-sp &
+#devu-ft245 -b 500 &
+# Load font data
+cfont -f 0 /etc/config/cfont/alt-concu14.fon
+
+# Start keymap switcher
+kbswitch -p /etc/config/kbd/USA -s /etc/config/kbd/Russia &

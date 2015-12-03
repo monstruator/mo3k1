@@ -1,0 +1,4 @@
+//9 //9/bin/io-usb -d ehci pindex=1 -d ohci pindex=3 -d ohci pindex=4 &
+sleep 6
+//9 //9/bin/devu-ft245 -b 200 -p 20 -vvvv &
+

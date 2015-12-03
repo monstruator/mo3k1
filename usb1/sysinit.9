@@ -1,0 +1,45 @@
+#Dev32 &
+#05.05.06
+export PATH=$PATH:.:/etc:usr/ucb:
+Dev32.ser -F -t 14 -I 4096 -O 4096 -b 28800 0x3f8,4 0x2f8,3 &
+Net -d4 &
+#Net.fd -l 4 -h -d 1000 /dev/ser1 &
+Net.vega -m 00200b000091 -l1 -w 10 &
+#09.07.05 
+netmap -f
+nameloc &
+lic_load
+PCS_M &
+IO_DT_SOI &
+tx_drv 0 &
+sleep 1
+/etc/config/bin/tcpip.$NODE
+export LOGNAME=root
+pci_err
+rtc -l at
+#!!!!ticksize 0.5
+#/bin/light_p
+
+sleep 2
+
+TInCVS
+/stand/script_pt
+
+sleep 2
+Dev32.pcsm &
+sleep 1
+/bin/io-usb -d ehci pindex=1 -d ohci pindex=3 -d ohci pindex=4 &
+sleep 10
+/bin/devu-ft245 -b 200 -p 20 &
+/stand/m3 &
+sleep 2
+/stand/obmen31_41 &
+/stand/obmen31_42 &
+/stand/k1 &
+/stand/KRK12P &
+/stand/k2 &
+sleep 5
+/home/read_ft245 -l 1 &
+
+#tinit -t /dev/ser2 &
+

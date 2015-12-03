@@ -1,0 +1,8 @@
+cc -T3 -o k1 k1.c
+cc -T3 -o k2 k2.c
+cc -T3 -o m3 m3.c
+cc -T3 -o obmen_MO3 obmen_MO3.c
+#cc -T3 -o printp printp.c
+rm *.o
+
+ 
