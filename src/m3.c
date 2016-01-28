@@ -68,7 +68,7 @@ int TIMESEV,setANT=0,minus_x;
 	double x,y,x1,y1,C,S,ri,r1,r2,r3,
 	x2=0,y2=0;//дельты по качкам
 	double prim,primq,primcos;
-float KK=0,KK1=0, Angle1=0;  //курс корабля и реальный угол антенны
+float KK=0,KK1=0;  //курс корабля
 //const AgpecHK=28,AgpecCEB=31,nogAgpecHK=0,nogAgpecCEB=0;// agpeca OY
 const AgpecHK=18,AgpecCEB=18,nogAgpecHK=0,nogAgpecCEB=0;// agpeca OY ???(CEB=17,18)
 const Ynp_np1=1,HK=2,CEB=0;// No KAH MK
@@ -171,13 +171,11 @@ for(;;)//----- CEPBEP -----//
 
 		//ANGLE
 	    memcpy(&byta2,&p->Dout41[0],2);	 Flt=byta2*pi/(1<<14); p->simfonia41.Kg=Flt;// printf("Kypc=%8.4f \n",Flt);
-		Angle1=(p->Dout41[16]-1991)*2/RADtoGRAD+KK+x2;//Азимут+курс
+		p->to_MO3.to41.P_FACT=(p->Dout41[16]-1991)*2/RADtoGRAD+KK+x2;//Азимут+курс
 
-		if (Angle1<0) p->to_MO3.to41.P_FACT+=2*pi;//Азимут+курс
-		if (Angle1>2*PI) p->to_MO3.to41.P_FACT-=2*pi;//Азимут+курс
-		
-		p->to_MO3.to41.P_FACT=Angle1;
-		
+		if (p->to_MO3.to41.P_FACT<0) p->to_MO3.to41.P_FACT+=2*pi;//Азимут+курс
+		if (p->to_MO3.to41.P_FACT>2*PI) p->to_MO3.to41.P_FACT-=2*pi;//Азимут+курс
+
 		if (p->Dout41[18]&0x800) p->to_MO3.to41.beta_FACT=(360-p->Dout41[18]/C2)/C3; //УГОЛ МЕСТА
 			else p->to_MO3.to41.beta_FACT=-p->Dout41[18]/C1;
 		p->to_MO3.to41.beta_FACT+=y2;
@@ -201,20 +199,33 @@ for(;;)//----- CEPBEP -----//
 //		printf("ModA simf- "); 	for(j=0;j<15;j++) printf("%x ",dev->tx_B[j]);printf("\n");
 		//printf("%x\n",p->Dout41[4]);
 
+	    //memcpy(&b2,&p->Dout41[5],2);	 KK=b2*pi/(1<<14);
 	    KK=p->Dout41[5]*pi/(1<<14);
 		KK=KK+pi; 
 		if (KK>2*pi) KK=KK-2*pi; //переворот с кормы в нос
 		//	printf("KK=%f ",KK);
 
 		//КАЧКИ
+//		if (p->Dout41[3]&0x8000) PSI=-(p->Dout41[3])*NAVtoRAD/4;
+//		    else PSI=(float)p->Dout41[4]*NAVtoRAD/4;
+//		if (p->Dout41[1]&0x8000) TETA=-(p->Dout41[2])*NAVtoRAD/4;
+//		    else TETA=(float)p->Dout41[2]*NAVtoRAD/4;
+
 		if (p->Dout41[1]&0x8000) PSI=-(0xffff-p->Dout41[1])*pi/(1<<14);
 		    else PSI=p->Dout41[1]*pi/(1<<14);
+
 		if (p->Dout41[3]&0x8000) TETA=-(0xffff-p->Dout41[3])*pi/(1<<14);
 		    else TETA=p->Dout41[3]*pi/(1<<14);
 
-    //	if (abs(PSI)>1/4)  PSI=oldPSI;	//	if (abs(TETA)>1/4) TETA=oldTETA;
+//			if (dev->tx_B[6]==0x8000) PSI=0;
+//			if (dev->tx_B[7]==0x8000) TETA=0;
+
+	//	if (abs(PSI)>1/4)  PSI=oldPSI;
+	//	if (abs(TETA)>1/4) TETA=oldTETA;
 	//	printf(" TETA=%f(%f) PSI=%f(%f)\n",PSI,PSI*57.32,TETA,TETA*57.32);
-		break;
+	//	printf(" A_simf "); 	for(j=0;j<9;j++) printf("%04x ",p->Dout41[j]);printf("\n");
+		
+  		break;
 	case 4:owu6ka|=32;break; // HEBEPEH proxy HK
 	case 5://--- npueM KY cuHxp HK ---//
 		ou_mode_read(dev,HK,0x8000);
@@ -271,7 +282,9 @@ for(;;)//----- CEPBEP -----//
 			//printf("H=%d M=%d S=%d T41=%d T31=%d \n",p->Dout41[30],p->Dout41[31],p->Dout41[32],p->from_MO3.from41.T_SS,p->Dout41[30]*3600+p->Dout41[31]*60+p->Dout41[32]);			
 			//printf("navi=%d jump=%d \n",p->no_navi,p->jump);
 			
-			//КАЧКИ 		oldPSI=PSI; 	oldTETA=TETA;		
+			//КАЧКИ
+			oldPSI=PSI;
+			oldTETA=TETA;		
 	
 			if (p->num_com==1) //подготовка к сеансу связи
 			{
@@ -305,9 +318,11 @@ for(;;)//----- CEPBEP -----//
  
 				p->toPR1[0]=KK1*RADtoGRAD/2+1991;//Азимут	
 //!!!
-				x=(double)KK1; //азимут от 4-1	
+				/*x=(double)KK1; //азимут от 4-1	
 				if (x<0) {x+=2*PI;minus_x=1;} else minus_x=0;
 				y=(double)p->from_MO3.from41.beta;
+		//		PSI=(double)i*rad;		
+		//		TETA=(double)i*rad;		// град
 				r1=cos(y);			r3=sin(y);
 				r2=r1*cos(x);		r1=r1*sin(x);
 				C=cos(-PSI);S=sin(-PSI);
@@ -323,7 +338,7 @@ for(;;)//----- CEPBEP -----//
 				//printf(" x0=%3.1f y0=%3.1f PSI=%3.1f TETA=%3.1f x1=%3.1f y1=%3.1f\n",
 				//KK*grad,y*grad,PSI*grad,TETA*grad,x1*grad,y1*grad);
 				
-				/*KK1=x1;
+				KK1=x1;
 				oldKOD=p->PR1[0];
 				oldKK=(oldKOD-1991)/325.94915;//Азимут установленный	
 				if (KK1!=oldKK)
@@ -406,7 +421,7 @@ for(;;)//----- CEPBEP -----//
 				
 			}
 			//printf("n_c=%d \n",p->num_com);
-	    	else
+	    	
 			if (p->num_com==301) //
 			{	//
     			if (p->from_MO3.fromAK.beta>=0)	p->toPR1[2]=-p->from_MO3.fromAK.beta*C1;//╙уюы ьхёЄр
@@ -416,7 +431,7 @@ for(;;)//----- CEPBEP -----//
 				//if (KK1>pi) KK1=-KK1;
 				if (KK1>4.71225) KK1=KK1-2*PI;
 				if (KK1<-4.71225) KK1=KK1+2*PI;
-				//printf("Peleng=%2.2f KK=%1.2f KK1=%1.2f\n", p->from_MO3.fromAK.Peleng, KK, KK1);
+				printf("Peleng=%2.2f KK=%1.2f KK1=%1.2f\n", p->from_MO3.fromAK.Peleng, KK, KK1);
 				p->toPR1[0]=KK1*RADtoGRAD/2+1991;//└чшьєЄ	
 			}
 				//-------------------------------------------------------------

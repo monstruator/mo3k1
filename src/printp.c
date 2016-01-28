@@ -77,6 +77,7 @@ void main( void )
 
 		//printf("lvl = %d data=%d Nmas=%d\n",p->to_MO3.to41.UR_sign_K1,p->U.c_OI,p->to_MO3.to41.cr_SEANCE);
 		//printf("%d\n",p->from_MO3.from41.num_KS); 
+		printf(" alfa=%04x ",p->PR1[1]); 
 
 //		if (p->from_MO3.from41.num_KS==1) 
 		{	
@@ -102,12 +103,12 @@ void main( void )
 //-------------------------------------------------------------------------------------
 //		printf("to_MO3.to41=%2.2f fr41=%2.2f fact=%2.2f Pr1=%d ",p->to_MO3.to41.P_FACT,p->from_MO3.from41.P_ANT,p->to_MO3.to41.P_FACT-p->to_MO3.to41.simfonia41.Kg,p->Dout41[16]); //16
 //		printf("fr41=%2.2f fact=%2.2f Pr1=%d ",p->from_MO3.from41.P_ANT,p->to_MO3.to41.P_FACT-p->to_MO3.to41.simfonia41.Kg,p->Dout41[18]); //16
-		printf(" Si=%d Inf=%1.1e DPL=%2.2d ",p->to_MO3.to41.UR_sign_K1,p->U.SUM_20,p->U.DPL_1*244);
+//		printf(" Si=%d Inf=%1.1e DPL=%2.2d ",p->to_MO3.to41.UR_sign_K1,p->U.SUM_20,p->U.DPL_1*244);
 //		printf(" D=%f Vr=%f ",p->from_MO3.from41.D,p->from_MO3.from41.Vr);
 //			printf("H=%d M=%d S=%d T41=%d T31=%d\n",p->Dout41[30],p->Dout41[31],p->Dout41[32],p->from_MO3.from41.T_SS,p->Dout41[30]*3600+p->Dout41[31]*60+p->Dout41[32]);
 //			printf("  D=%d \n",p->from_MO3.from41.T_SS-10-(p->Dout41[30]*3600+p->Dout41[31]*60+p->Dout41[32]));
 			
-		printf(" num_com=%d GSS=%d ",p->from_MO3.from41.num_com,p->to_MO3.to41.pr_GSS);
+//!		printf(" num_com=%d GSS=%d ",p->from_MO3.from41.num_com,p->to_MO3.to41.pr_GSS);
 //		printf("cr_seance=%d\n",p->to_MO3.to41.cr_SEANCE);
 //    	printf(" size=%d\n",sizeof(obmen_31_41_t)); ///!!!!!!
 

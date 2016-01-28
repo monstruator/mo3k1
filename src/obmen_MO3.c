@@ -75,7 +75,7 @@ float Angle0;
  C1=2048./pi;C2=4096.0/360.0;C3=180./pi;C4=C1*Kncu;
  C5=C2*Kncu;C6=C1*Kq;C7=C3;C8=C2*Kq;
 //поиск сервера
-qnx_name_attach(0,"4.1");
+//qnx_name_attach(0,"4.1");
 //инициализация канала UDP
 	i = Udp_Client_Ini(&Uc41,"194.1.1.6",SRC_PORT41,DST_PORT41);
 	printf(" Udp_Init=%d	\n", i);
