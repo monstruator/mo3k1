@@ -292,7 +292,7 @@ while(1)
 
 	
 //	p->to_MO3.to42.sum_K1=p->U.SUM_4;
-	p->to_MO3.to42.sum_K1=p->U.SUM_20; //выводить после логарифма
+//	p->to_MO3.to42.sum_K1=p->U.SUM_20; //выводить после логарифма
 	
 
 	p->to_MO3.to42.D_K1=(float)p->U.DPL_1*244.14;

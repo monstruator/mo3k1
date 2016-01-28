@@ -144,7 +144,8 @@ void main( int argc, char *argv[] )
 				case 7 : Write_K1(DPL1); break;						
 				case 9 : //раз в пол сек выполняем сервисные операции
 						test_dpl=(p->from_MO3.from41.Fd+0.244)*1000; //корректировка ошибки определения Доплера в ЧУПОС
-						if (p->U.SUM_4>1e+6) p->to_MO3.to41.UR_sign_K1=(short)((log10(p->U.SUM_4)-6)*16);	else p->to_MO3.to41.UR_sign_K1=0;
+						if (p->U.SUM_4>1e+8) p->to_MO3.to41.UR_sign_K1=(short)((log10(p->U.SUM_4)-8)*16);	else p->to_MO3.to41.UR_sign_K1=0;
+						p->to_MO3.to42.sum_K1=p->U.SUM_4;
 						if ((p->num_com!=6)&&(abs(test_dpl-Dopler1) > 2000)) 
 						{
 							Dopler1=(float)p->from_MO3.from41.Fd*1000;
