@@ -302,8 +302,8 @@ while(1)
 	p->to_MO3.to42.q=(p->PR1[0]-1991)*2/RADtoGRAD; //€‡ˆŒ“’
 	if (p->PR1[2]&0x800) p->to_MO3.to42.beta=(360-p->PR1[2]/C2)/C3; //“ƒŽ‹ Œ…‘’€
 	else p->to_MO3.to42.beta=-p->PR1[2]/C1;
-	if (p->PR1[1]&0x800) p->to_MO3.to42.alfa=(p->PR1[1]-0xFFF)/12.27/RADtoGRAD;//Š…
-	else p->to_MO3.to42.alfa=p->PR1[1]/C4; 
+	//if (p->PR1[1]&0x800) p->to_MO3.to42.alfa=(p->PR1[1]-0xFFF)/12.27/RADtoGRAD;//Š…
+	//else p->to_MO3.to42.alfa=p->PR1[1]/C4; 
 
 	for(i1=0;i1<16;i1++) {buf[0]+=((p->to_MO3.to42.Ms1>>i1)&1)<<(15-i1);} p->to_MO3.to42.Ms1=buf[0];buf[0]=0;
 	for(i1=0;i1<16;i1++) {buf[0]+=((p->to_MO3.to42.Ms2>>i1)&1)<<(15-i1);} p->to_MO3.to42.Ms2=buf[0];buf[0]=0;

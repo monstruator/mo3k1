@@ -168,6 +168,11 @@ for(;;)//----- CEPBEP -----//
 		p->Dout41[Cq]=p->PR1[0];  // q
 		p->Dout41[Cq+1]=p->PR1[1];// ncu
 		p->Dout41[Cq+2]=p->PR1[2];// mema
+		
+		if (alfa1>0.251) p->to_MO3.to42.alfa=0.258;
+		else if (alfa1<-0.251) p->to_MO3.to42.alfa=-0.255;
+			 else if (p->PR1[1]&0x800) p->to_MO3.to42.alfa=(p->PR1[1]-0xFFF)/12.27/RADtoGRAD;//КРЕН
+				  else p->to_MO3.to42.alfa=p->PR1[1]/C4;	
 
 		//ANGLE
 	    memcpy(&byta2,&p->Dout41[0],2);	 Flt=byta2*pi/(1<<14); p->simfonia41.Kg=Flt;// printf("Kypc=%8.4f \n",Flt);
@@ -396,16 +401,16 @@ for(;;)//----- CEPBEP -----//
 					{
 //						//printf("PSI=%f TETA=%f\n",PSI,TETA);
 
-						beta1=p->from_MO3.from42.beta-TETA;
+						beta1=p->from_MO3.from42.beta-PSI;
 						if (beta1>=0)	p->toPR1[2]=-beta1*C1;//Угол места
 						else p->toPR1[2]=(360+(-beta1*C3))*C2;//
 
-						alfa1=p->from_MO3.from42.alfa-PSI;
+						alfa1=p->from_MO3.from42.alfa-TETA;
 						if (alfa1>=0)	p->toPR1[1]=alfa1*C4;//KPEH
 						else p->toPR1[1]=0xFFF+(alfa1*RADtoGRAD)*12.27;
 
 						p->toPR1[0]=KK1*RADtoGRAD/2+1991;//Азимут
-
+						//printf("alfa1=%f beta1=%f \n",alfa1,beta1);
 					}
 					else 
 					{
