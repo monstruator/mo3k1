@@ -74,8 +74,7 @@ unsigned short buf[4];
 float Angle0;
  C1=2048./pi;C2=4096.0/360.0;C3=180./pi;C4=C1*Kncu;
  C5=C2*Kncu;C6=C1*Kq;C7=C3;C8=C2*Kq;
-//поиск сервера
-//qnx_name_attach(0,"4.1");
+
 //инициализация канала UDP
 	i = Udp_Client_Ini(&Uc41,"194.1.1.6",SRC_PORT41,DST_PORT41);
 	printf(" Udp_Init=%d	\n", i);
@@ -89,16 +88,12 @@ float Angle0;
 	open_shmem();
 	delay(1000);
 
-	//Angle0=4;
-	//p->jump=-1;
 
 while(1)
   {
-	//for(i=0;i<sizeof(obmen_41_31_t);i++) bufi[i]=0;
-
 	bytes = Udp_Client_Read(&Uc41,bufi,4096);
-//	printf(" read=%d size1=%d size2=%d size3=%d sizeALL=%d\n",
-//	bytes,sizeof(obmen_42_31_2t),sizeof(obmen_41_31_2t),sizeof(obmen_AK_MN3_MO3K_t),sizeof(obmen_MO3_MO3K_t));
+	//printf(" read=%d size1=%d size2=%d size3=%d sizeALL=%d\n",
+	//bytes,sizeof(obmen_42_31_2t),sizeof(obmen_41_31_2t),sizeof(obmen_AK_MN3_MO3K_t),sizeof(obmen_MO3_MO3K_t));
 
     memcpy(&p->from_MO3,&bufi[4],sizeof(obmen_MO3_MO3K_t)); 
 	//выбор управляюще1 команды
@@ -194,16 +189,16 @@ while(1)
  	buf[2]=p->Dout41[9];
 	buf[3]=p->Dout41[8];		
  
-	p->simfonia41.status1=p->Dout41[24];
-    //memcpy(&byta2,&p->Dout41[0],2);	 Flt=byta2*pi/(1<<14); p->simfonia41.Kg=Flt;// printf("Kypc=%8.4f \n",Flt);
-    memcpy(&byta2,&p->Dout41[4],2);	 Flt=byta2*Mc;p->simfonia41.V=Flt;	
-    memcpy(&byta4,&buf[0],4);	 Flt=byta4*pi/(1<<31);p->simfonia41.fi=-Flt;// printf("Fi=%f \n",Flt*180/pi);
-    memcpy(&byta4,&buf[2],4);	 p->simfonia41.la=-(byta4*pi/(1<<31));	
+	p->to_MO3.simfonia41.status1=p->Dout41[24];
+    //memcpy(&byta2,&p->Dout41[0],2);	 Flt=byta2*pi/(1<<14); p->to_MO3.simfonia41.Kg=Flt;// printf("Kypc=%8.4f \n",Flt);
+    memcpy(&byta2,&p->Dout41[4],2);	 Flt=byta2*Mc;p->to_MO3.simfonia41.V=Flt;	
+    memcpy(&byta4,&buf[0],4);	 Flt=byta4*pi/(1<<31);p->to_MO3.simfonia41.fi=-Flt;// printf("Fi=%f \n",Flt*180/pi);
+    memcpy(&byta4,&buf[2],4);	 p->to_MO3.simfonia41.la=-(byta4*pi/(1<<31));	
 
-    memcpy(&byta2,&p->Dout41[10],2); p->simfonia41.a=byta2*32000./(1<<15);	
-    memcpy(&byta2,&p->Dout41[11],2); p->simfonia41.b=byta2*32000./(1<<15);	
-    memcpy(&byta2,&p->Dout41[12],2); p->simfonia41.tau=byta2*pi/(1<<15);	
-    memcpy(&byta2,&p->Dout41[13],2); p->simfonia41.status2=byta2;	
+    memcpy(&byta2,&p->Dout41[10],2); p->to_MO3.simfonia41.a=byta2*32000./(1<<15);	
+    memcpy(&byta2,&p->Dout41[11],2); p->to_MO3.simfonia41.b=byta2*32000./(1<<15);	
+    memcpy(&byta2,&p->Dout41[12],2); p->to_MO3.simfonia41.tau=byta2*pi/(1<<15);	
+    memcpy(&byta2,&p->Dout41[13],2); p->to_MO3.simfonia41.status2=byta2;	
 
 
 //	printf("%02x%02x	",p->Dout41[6],p->Dout41[7]);

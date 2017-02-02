@@ -70,7 +70,7 @@ int TIMESEV,setANT=0,minus_x;
 	double prim,primq,primcos;
 float KK=0,KK1=0;  //курс корабля
 //const AgpecHK=28,AgpecCEB=31,nogAgpecHK=0,nogAgpecCEB=0;// agpeca OY
-const AgpecHK=18,AgpecCEB=18,nogAgpecHK=0,nogAgpecCEB=0;// agpeca OY ???(CEB=17,18)
+const AgpecHK=28,AgpecCEB=18,nogAgpecHK=0,nogAgpecCEB=0;// agpeca OY ???(CEB=17,18)
 const Ynp_np1=1,HK=2,CEB=0;// No KAH MK
 const Cnp1=1,CK1=Cnp1+8,CK2=CK1+20;//cMeweHue gaHHblx B Dout
 const Cq=16,C42np1=10;//cMeweHue gaHHblx B Dout
@@ -176,7 +176,7 @@ for(;;)//----- CEPBEP -----//
 				  else p->to_MO3.to42.alfa=p->PR1[1]/C4;	
 
 		//ANGLE
-	    memcpy(&byta2,&p->Dout41[0],2);	 Flt=byta2*pi/(1<<14); p->simfonia41.Kg=Flt;// printf("Kypc=%8.4f \n",Flt);
+	    //memcpy(&byta2,&p->Dout41[0],2);	 Flt=byta2*pi/(1<<14); p->onia41.Kg=Flt; //printf("Kypc=%8.4f \n",Flt);
 		p->to_MO3.to41.P_FACT=(p->Dout41[16]-1991)*2/RADtoGRAD+KK+x2;//Азимут+курс
 
 		if (p->to_MO3.to41.P_FACT<0) p->to_MO3.to41.P_FACT+=2*pi;//Азимут+курс
@@ -196,15 +196,14 @@ for(;;)//----- CEPBEP -----//
 		SIMF[0]++; //есть симфония
 		if (SIMF[0]==60000) SIMF[0]=0;
 		if(ou_read(dev,HK,nogAgpecHK)){owu6ka|=8;break;}
-   		if((dev->tx_B[3])!=32)  {owu6ka|=512;printf("error=%d\n",dev->tx_B[3]);break;}
-   		if((dev->tx_B[1])!=0x12)  break; //адрес кормовой качки
-		//printf("%d\n",dev->tx_B[3]);
-    	for(j=0;j<15;j++) p->Dout41[j]=dev->tx_B[4+j]; //--- npueM HK
-		//printf("N=%d",SIMF[0]);
+   		if((dev->tx_B[3])!=15)  {owu6ka|=512;printf("error=%d\n",dev->tx_B[3]);break;}
+   		for(j=0;j<15;j++) p->Dout41[j]=dev->tx_B[4+j]; //--- npueM HK
+		memcpy(&byta2,&p->Dout41[0],2);	 Flt=byta2*pi/(1<<15); p->simfonia41.Kg=Flt; //printf("Kypc=%8.4f \n",Flt);
+		
 //		printf("ModA simf- "); 	for(j=0;j<15;j++) printf("%x ",p->Dout41[j]);printf("\n");
 //		printf("ModA simf- "); 	for(j=0;j<15;j++) printf("%x ",dev->tx_B[j]);printf("\n");
 		//printf("%x\n",p->Dout41[4]);
-
+//		printf("Kypc=%8.4f \n",Flt*RAD);
 	    //memcpy(&b2,&p->Dout41[5],2);	 KK=b2*pi/(1<<14);
 	    KK=p->Dout41[5]*pi/(1<<14);
 		KK=KK+pi; 
