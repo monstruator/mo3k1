@@ -13,16 +13,6 @@
   #include "../include/IO_DT_SOI.h"
   #include "../include/func_IP.h"
 
-  #define PKDMV 0x0001
-  #define PKVH  0x0002
-  #define PKPRD 0x0004
-  #define PKPRM 0x0008
-  #define PKVIH 0x0010
-  #define PKZA  0x0020
-  #define RES90 0x0200
-  #define SVC   0x0400
-  #define SVCFC 0x0800
-
   #define SRC_PORT41 8208
   #define DST_PORT41 8208
 
@@ -30,27 +20,21 @@
   # define max_len_IP     4096*8
 
 
-	float Mc=64.*1852./32384./3600., Dbl, Flt=0;
-	int sock, length, i , count_mes=0;
+	float Dbl, Flt=0;
 	static Udp_Client_t Uc41,Uc42;
 	char bufi[1024];
 	char bufo[1024];
 	char gloria_start=0;	
 	char gloria_count=0;	
-	unsigned int pr1_c_old=0;
+	unsigned int pr1_c_old=0, i;
 	unsigned int AK_c=0; //счетчик обмена после поступления команды АК
-	short bM4; //буфер для M4
 	short cr_com41=0,cr_com42=0,cr_comAK=0;
-	char out_buf[1024];
-	//obmen_41_31_t from41;	
-	//obmen_31_41_t to41;	
+	char out_buf[1024];	
 	paramAKcom=0;
 	simfonia41_t simfonia;	
 	int r,bytes,byta4;
-	pid_t pid_CEP;
-	short MK2[15];
 	//unsigned short buf;
-	short byta2,T,len_OUT,sen,j;
+	short byta2,len_OUT,j;
     div_t   vol;    // vol.quot - количество полных томов
     char          pack_buf[1500];  // буфер задачи obm_41_31. Выходные данные в Socket
     char                 numb_pack,     // текущий номер пакета
@@ -67,11 +51,9 @@ main ()
 float 	C1,C2,C3,C4,C5,C6,C7,C8;
 unsigned short cr_com; //порядковый номер предыдущей команды
 		short		V,dV;
-int cnt=0;
 int i1=0,i2;
 int rez;
 unsigned short buf[4];
-float Angle0;
  C1=2048./pi;C2=4096.0/360.0;C3=180./pi;C4=C1*Kncu;
  C5=C2*Kncu;C6=C1*Kq;C7=C3;C8=C2*Kq;
 
@@ -87,7 +69,6 @@ float Angle0;
 	delay(2000);
 	open_shmem();
 	delay(1000);
-
 
 while(1)
   {
@@ -127,7 +108,6 @@ while(1)
 		printf(" New Command AK = %d , p[0]=%d , cr_com = %d\n",
 				p->from_MO3.fromAK.num_com,p->from_MO3.fromAK.a_params[0],p->from_MO3.fromAK.cr_com);
 		p->M[2]=0x0001; //РЭЛЕ АК
-		bM4=0;
 		paramAKcom=0;
 		switch(p->num_com)
 		{
@@ -184,13 +164,13 @@ while(1)
 	//p->from41.ZUNf,p->from41.Nans_PSP,p->from41.Vr,p->from41.Ar);
 
 	//SIMFONIA
-	buf[0]=p->Dout41[7]; 
+/*  buf[0]=p->Dout41[7]; 
 	buf[1]=p->Dout41[6];
  	buf[2]=p->Dout41[9];
 	buf[3]=p->Dout41[8];		
  
 	p->to_MO3.simfonia41.status1=p->Dout41[24];
-    //memcpy(&byta2,&p->Dout41[0],2);	 Flt=byta2*pi/(1<<14); p->to_MO3.simfonia41.Kg=Flt;// printf("Kypc=%8.4f \n",Flt);
+    memcpy(&byta2,&p->Dout41[0],2);	 Flt=byta2*pi/(1<<14); p->to_MO3.simfonia41.Kg=Flt;// printf("Kypc=%8.4f \n",Flt);
     memcpy(&byta2,&p->Dout41[4],2);	 Flt=byta2*Mc;p->to_MO3.simfonia41.V=Flt;	
     memcpy(&byta4,&buf[0],4);	 Flt=byta4*pi/(1<<31);p->to_MO3.simfonia41.fi=-Flt;// printf("Fi=%f \n",Flt*180/pi);
     memcpy(&byta4,&buf[2],4);	 p->to_MO3.simfonia41.la=-(byta4*pi/(1<<31));	
@@ -199,7 +179,8 @@ while(1)
     memcpy(&byta2,&p->Dout41[11],2); p->to_MO3.simfonia41.b=byta2*32000./(1<<15);	
     memcpy(&byta2,&p->Dout41[12],2); p->to_MO3.simfonia41.tau=byta2*pi/(1<<15);	
     memcpy(&byta2,&p->Dout41[13],2); p->to_MO3.simfonia41.status2=byta2;	
-
+*/
+    memcpy(&p->to_MO3.SIMF32,&p->Dout41[0],sizeof(p->to_MO3.SIMF32)); 
 
 //	printf("%02x%02x	",p->Dout41[6],p->Dout41[7]);
 //  printf("Kg=%4.3f V=%4.3f fi=%4.3f ",p->to41.simfonia41.Kg, p->to41.simfonia41.V,p->to41.simfonia41.fi);
@@ -368,7 +349,7 @@ while(1)
          pack_buf[2] = 1;
          pack_buf[3] = 1;
          for (j = 0; j<1400; j++) pack_buf[j+4] = ip_out.out_buf[j];
-         sen = Udp_Client_Send(&Uc41,pack_buf,(len_OUT+4));
+         Udp_Client_Send(&Uc41,pack_buf,(len_OUT+4));
     }
     else
     {

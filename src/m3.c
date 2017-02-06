@@ -202,7 +202,7 @@ for(;;)//----- CEPBEP -----//
 		
 //		printf("ModA simf- "); 	for(j=0;j<15;j++) printf("%x ",p->Dout41[j]);printf("\n");
 //		printf("ModA simf- "); 	for(j=0;j<15;j++) printf("%x ",dev->tx_B[j]);printf("\n");
-		//printf("%x\n",p->Dout41[4]);
+//		printf("%x\n",p->Dout41[4]);
 //		printf("Kypc=%8.4f \n",Flt*RAD);
 	    //memcpy(&b2,&p->Dout41[5],2);	 KK=b2*pi/(1<<14);
 	    KK=p->Dout41[5]*pi/(1<<14);
@@ -242,7 +242,7 @@ for(;;)//----- CEPBEP -----//
 		//if((dev->tx_B[3])!=6){owu6ka|=128;break;}
 		for(j=0;j<6;j++) p->CEB[j]=dev->tx_B[4+j]; //--- npueM CEB
 
-		//for(j=0;j<6;j++) printf(" %x",p->CEB[j]);printf("\n"); //--- npueM CEB
+		for(j=0;j<6;j++) printf(" %x",p->CEB[j]);printf("\n"); //--- npueM CEB
 		//printf("%02x:%02x:%02x ", p->CEB[2]>>8,p->CEB[3]>>8,p->CEB[3]&0x00ff);printf("\n");
 		break;//--- end npueMHuk CEB ---//
 	case 7:case 8:owu6ka|=256;break; // HEBEPEH proxy CEB
@@ -252,22 +252,23 @@ for(;;)//----- CEPBEP -----//
 		i=Read_ModB(); //читаем данные из Мод Б
 		//if (i!=48) break; //если не целый пакет - выход
 		//printf("nk=%x sev=%x\n",Din_ModB[1],Din_ModB[2]);
-		if (Din_ModB[1]==0) ispr->nkB=0; //всегда работает навигация в Мод Б
-		//if (Din_ModB[1]==0) ispr->nkB=1; //признак наличия навигации в Мод Б
+		//if (Din_ModB[1]==0) ispr->nkB=0; //всегда работает навигация в Мод Б
+		if (Din_ModB[1]==0) ispr->nkB=1; //признак наличия навигации в Мод Б
 		else {
 				ispr->nkB=0; //навигац Мод Б исправна
 			    if (ispr->nkA==1) //если нет навигации в Мод А
 					for(j=0;j<15;j++) p->Dout41[j]=Din_ModB[j+2]; //используем из Б
 			 }		
-		if (Din_ModB[2]==0) ispr->sevB=1; //признак наличия СЕВ в Мод Б
+		if (Din_ModB[17]==0) ispr->sevB=1; //признак наличия СЕВ в Мод Б
 		else {
 				ispr->sevB=0; //сев Мод Б исправен
-			    p->Dout41[30]=(Din_ModB[20]>>8)&0x000F;
-				p->Dout41[30]+=(Din_ModB[20]>>12)*10;     //hours
-				p->Dout41[31]=(Din_ModB[21]>>8)&0x000F;
-				p->Dout41[31]+=(Din_ModB[21]>>12)*10;	//minutes
-				p->Dout41[32]=Din_ModB[21]&0x000F;
-				p->Dout41[32]+=((Din_ModB[21]>>4)&0x000f)*10; //seconds
+				for(j=0;j<6;j++) p->CEB[j]=Din_ModB[18+j]; //--- npueM CEB
+			    //p->Dout41[30]=(Din_ModB[20]>>8)&0x000F;
+				//p->Dout41[30]+=(Din_ModB[20]>>12)*10;     //hours
+				//p->Dout41[31]=(Din_ModB[21]>>8)&0x000F;
+				//p->Dout41[31]+=(Din_ModB[21]>>12)*10;	//minutes
+				//p->Dout41[32]=Din_ModB[21]&0x000F;
+				//p->Dout41[32]+=((Din_ModB[21]>>4)&0x000f)*10; //seconds
 			 }			 
 		
 		//printf("ModB - ");	for(j=0;j<3;j++) printf("%x ",Din_ModB[j]);printf("\n");

@@ -146,9 +146,7 @@ void main( void )
 	}	
 	
 	if (cr_SEANCE!=p->to_MO3.to41.cr_SEANCE)
-	{
 		if ( out_fp_data != NULL ) 
-		{
 			if (p->from_MO3.from41.num_KS==1) 
 			{
 				for(i=0;i<p->to_MO3.to41.sum_DCP;i++) fwrite( &p->to_MO3.to41.DCP_K1[i], 4, 1, out_fp_data );
@@ -159,8 +157,7 @@ void main( void )
 				for(i=0;i<p->to_MO3.to41.sum_DCP;i++) fwrite( &p->to_MO3.to41.DCP_K2[i], 2, 1, out_fp_data );
  				printf("Есть массив по К2 N%d. Количество слов %d\n",p->to_MO3.to41.cr_SEANCE,p->to_MO3.to41.sum_DCP);
 			}
-		}
-	}
+		
 		cr_SEANCE=p->to_MO3.to41.cr_SEANCE;		
 
 		if (kbhit()) break;

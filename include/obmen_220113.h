@@ -277,7 +277,9 @@ typedef struct	{
 }obmen_31_42_2t;
 
 typedef struct	{
-	simfonia41_t	simfonia41;		//навигационные данные обновляются 2гц
+	//simfonia41_t	simfonia41;		//навигационные данные обновляются 2гц
+	unsigned short SIMF32[15];
+	unsigned short CEB[6];
 	obmen_31_41_2t to41;
 	obmen_31_42_2t to42;
 	obmen_AK_MO3K_MN3_t toAK;
