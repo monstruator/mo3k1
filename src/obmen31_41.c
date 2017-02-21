@@ -181,7 +181,8 @@ while(1)
     memcpy(&byta2,&p->Dout41[13],2); p->to_MO3.simfonia41.status2=byta2;	
 */
     memcpy(&p->to_MO3.SIMF32,&p->Dout41[0],sizeof(p->to_MO3.SIMF32)); 
-
+ 
+	memcpy(&p->to_MO3.CEB,&p->CEB,sizeof(p->to_MO3.CEB)); 
 //	printf("%02x%02x	",p->Dout41[6],p->Dout41[7]);
 //  printf("Kg=%4.3f V=%4.3f fi=%4.3f ",p->to41.simfonia41.Kg, p->to41.simfonia41.V,p->to41.simfonia41.fi);
 //	printf("la=%4.3f a=%4.3f b=%4.3f ",p->to41.simfonia41.la,p->to41.simfonia41.a,p->to41.simfonia41.b);

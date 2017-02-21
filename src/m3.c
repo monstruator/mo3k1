@@ -160,7 +160,7 @@ for(;;)//----- CEPBEP -----//
 		if (p->PR1[4]&0x4000) p->to_MO3.to42.priem_K2=1; else p->to_MO3.to42.priem_K2=0;
 		p->PR1[3]=p->PR1[3]|0x2000; //ОС комп
 		p->PR1[4]=p->PR1[4]|0x0800; //TVP SUM
-		p->PR1[4]=p->PR1[4]|0x00ff; //лишние ниже списка
+		//p->PR1[4]=p->PR1[4]|0x00ff; //лишние ниже списка
 		
 		p->to_MO3.to42.Ms1=p->PR1[3];   //состояние прибора 1.0
 		p->to_MO3.to42.Ms2=p->PR1[4];
@@ -242,7 +242,7 @@ for(;;)//----- CEPBEP -----//
 		//if((dev->tx_B[3])!=6){owu6ka|=128;break;}
 		for(j=0;j<6;j++) p->CEB[j]=dev->tx_B[4+j]; //--- npueM CEB
 
-		for(j=0;j<6;j++) printf(" %x",p->CEB[j]);printf("\n"); //--- npueM CEB
+		//for(j=0;j<6;j++) printf(" %x",p->CEB[j]);printf("\n"); //--- npueM CEB
 		//printf("%02x:%02x:%02x ", p->CEB[2]>>8,p->CEB[3]>>8,p->CEB[3]&0x00ff);printf("\n");
 		break;//--- end npueMHuk CEB ---//
 	case 7:case 8:owu6ka|=256;break; // HEBEPEH proxy CEB
