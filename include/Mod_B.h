@@ -15,7 +15,7 @@
 //-------k2----
 pid_t proxy_DRV2=0,pid,
 	  proxy_RS; // Mod_B 
-unsigned char Din_ModB[30];  
+unsigned short Din_ModB[24];  
 char masK2[]={0x55, 0x04, 0x03, 0x01, 0x5d};
 int rez=0, err=0 ;
 int Ptec,lvlK2;

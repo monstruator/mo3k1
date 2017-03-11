@@ -146,7 +146,7 @@ void main( int argc, char *argv[] )
 						test_dpl=(p->from_MO3.from41.Fd+0.244)*1000; //корректировка ошибки определения Доплера в ЧУПОС
 						if (p->U.SUM_4>1e+8) p->to_MO3.to41.UR_sign_K1=(short)((log10(p->U.SUM_4)-8)*16);	else p->to_MO3.to41.UR_sign_K1=0;
 						p->to_MO3.to42.sum_K1=p->U.SUM_4;
-						if ((p->num_com!=6)&&(abs(test_dpl-Dopler1) > 2000)) 
+						if ((p->num_com!=6)&&(p->num_com<200)&&(abs(test_dpl-Dopler1) > 2000)) 
 						{
 							Dopler1=(float)p->from_MO3.from41.Fd*1000;
 							writeDopler(-Dopler1);
@@ -154,10 +154,10 @@ void main( int argc, char *argv[] )
 					
 						if ((p->num_com==6)&&(p->from_MO3.from42.Fd!=Dpl_42))
 						{
-							Dopler1=(float)((p->from_MO3.from42.Fd-2)*1000);
-							//writeDopler(-Dopler1);
+							Dopler1=(float)((p->from_MO3.from42.Fd)*1000);
+							writeDopler(Dopler1);
 							Dpl_42=p->from_MO3.from42.Fd;
-							printf("d_from41=%e\n",p->from_MO3.from42.Fd);
+							printf("d_from41=%e\n\n",p->from_MO3.from42.Fd);
 						}
 
 						//printf("lvl = %f data=%d\n",p->U.SUM_20,data_count);
