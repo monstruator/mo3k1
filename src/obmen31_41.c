@@ -63,7 +63,7 @@ unsigned short buf;
 	//gloriya(1,1,31);//test K2 по умолчанию
 	//gloriya(1,1,1);//work K2
 	//gloriya(1,0,2);//work K1
-	gloriya(1,0,31);//test K2 по умолчанию
+	gloriya(1,1,31);//test K2 по умолчанию
 
 	delay(2000);
 	open_shmem();
@@ -169,8 +169,8 @@ while(1)
 		}
 		printf("M=%d\n",paramAKcom);
 	}
-
-	if (p->from_MO3.from41.cr_com!=cr_com41) 
+	//есть команда для проведения сеанса связи
+	if (rec4.from41.cr_com!=cr_com41) 
 	{
 		//memcpy(&p->from_MO3,&bufi[4],sizeof(obmen_MO3_MO3K_t)); //копируем при утверждении команды
 		p->from_MO3.from41=rec4.from41;
@@ -261,7 +261,7 @@ while(1)
 	p->to_MO3.to42.USign=p->PR1[6]; //уровень сигнала ПРД из сост ПР1.0
 	p->to_MO3.to42.D_K1=(float)p->U.DPL_1*244.14;
 
-	printf("RANZ0=%f RAZN1=%f lvl=%d\n",p->U.RAZN_0,p->U.RAZN_1,p->to_MO3.to41.UR_sign_K1);
+	//printf("RAZN0=%f RAZN1=%f lvl=%d\n",p->U.RAZN_0,p->U.RAZN_1,p->to_MO3.to41.UR_sign_K1);
     //УГЛЫ
 	p->to_MO3.to42.q=(p->PR1[0]-1991)*2/RADtoGRAD; //АЗИМУТ
 	if (p->PR1[2]&0x800) p->to_MO3.to42.beta=(360-p->PR1[2]/C2)/C3; //УГОЛ МЕСТА

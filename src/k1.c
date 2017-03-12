@@ -55,7 +55,7 @@ void main( int argc, char *argv[] )
     }
 
 	//create_shmem();
-	delay(500);
+	delay(1500);
 	open_shmem();
 	delay(500);
 	
@@ -103,7 +103,7 @@ void main( int argc, char *argv[] )
     timer.it_value.tv_sec     = 3L; //start after X sec
     timer.it_value.tv_nsec    = 0L;
     timer.it_interval.tv_sec  = 0;
-    timer.it_interval.tv_nsec = 70*MS; //100
+    timer.it_interval.tv_nsec = 50*MS; //100
     timer_settime( id, 0, &timer, NULL );
 
     while(1) 
@@ -135,40 +135,43 @@ void main( int argc, char *argv[] )
 
 			switch (TC10)
 			{
-				case 0 : Write_K1(SUM4); break;
-				case 1 : Write_K1(ZI); break;
+				case 0 : Write_K1(SUM4);  break;
+				case 1 : Write_K1(ZI);    break;
 				case 2 : Write_K1(SUM20); break;
-				case 3 : Write_K1(YP); break;
+				case 3 : Write_K1(YP);    break;
 				case 4 : Write_K1(RAZN0); break;
-				case 5 : Write_K1(RAZN1); break;
-				case 7 : Write_K1(DPL1); break;						
+				case 5 : Write_K1(SUM4); break;
+				case 7 : Write_K1(DPL1);  break;						
 				case 9 : //раз в пол сек выполняем сервисные операции
 						test_dpl=(p->from_MO3.from41.Fd+0.244)*1000; //корректировка ошибки определения Доплера в ЧУПОС
 						if (p->U.SUM_4>1e+8) p->to_MO3.to41.UR_sign_K1=(short)((log10(p->U.SUM_4)-8)*16);	else p->to_MO3.to41.UR_sign_K1=0;
 						p->to_MO3.to42.sum_K1=p->U.SUM_4;
-						if ((p->num_com!=6)&&(p->num_com<200)&&(abs(test_dpl-Dopler1) > 2000)) 
+						if (p->from_MO3.from42.Rejim_AS==1) //режим АС
+						{
+							p->lvl_as[p->count_as]=p->to_MO3.to41.UR_sign_K1; //
+							p->count_as++;
+							if (p->count_as>9) p->count_as=9; 
+						}
+						if (((p->num_com==1)||(p->num_com==2))&&(abs(test_dpl-Dopler1) > 2000)) 
 						{
 							Dopler1=(float)p->from_MO3.from41.Fd*1000;
 							writeDopler(-Dopler1);
 						}
 					
-						if ((p->num_com==6)&&(p->from_MO3.from42.Fd!=Dpl_42))
+						if (((p->num_com==6)||(p->num_com==4)||(p->num_com==5))&&(p->from_MO3.from42.Fd!=Dpl_42))
 						{
 							Dopler1=(float)((p->from_MO3.from42.Fd)*1000);
 							writeDopler(Dopler1);
 							Dpl_42=p->from_MO3.from42.Fd;
-							printf("d_from41=%e\n\n",p->from_MO3.from42.Fd);
+							printf("d_from42=%e\n\n",p->from_MO3.from42.Fd);
 						}
-
 						//printf("lvl = %f data=%d\n",p->U.SUM_20,data_count);
 						//printf("n_com_from_k1 = %x \n",p->num_com);
 						//printf("SUM_4=%3.3e  	SUM_20=%3.3e 	DPL=%d hz\n",p->U.SUM_4,p->U.SUM_20,p->U.DPL_1*244);
 						//printf("OI=%x c_OI=%x\n",p->U.OI,p->U.c_OI);				
 						//printf("ZI_DATA=%x	 ZI_DOST=%x\n",p->U.ZI_DATA,p->U.ZI_DOST);
-
 						break;
 			}
-
 			//if (N==N1) printf("нет чтения\n");
 			N1=N;
 			if ((cr_com!=p->from_MO3.from41.cr_com)&&(p->num_com==1))	Init_K1(p->from_MO3.from41.num_KS-1);

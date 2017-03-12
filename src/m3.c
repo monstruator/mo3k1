@@ -19,57 +19,40 @@
 #include <sys/kernel.h>
 #include "../include/tx_drv.h"
 #include "../include/Mod_B.h"
-//-----------//
-//----- onucaHue nepeMeHHblx np.1.0 -----//
-short K2Init=0;//момент настройки К2 при команде "Начало СС"
 float oldKK,deltaKK,beta1,alfa1;
 float grad=180.0/PI;
 short oldKOD,deltaKOD; 
 short byta2;
 float Flt=0;
-     //-----------//
-int Seans=0; //признак начала сеанса по К2
-unsigned short toPR1[8]=
+//---------------------------------------------------------------//
+unsigned short toPR1[8]={0x07C7,0x0000,0x0000,0x0000,0x000e,0x0000,0x8410,0};
 //{0x07C7,0x0000,0x0000,0x0000,0x7000,0x0000,0x0841,0};
-{0x07C7,0x0000,0x0000,0x0000,0x000e,0x0000,0x8410,0};
 
-struct DefCMD acmd[2]=
-{{0x1028,toPR1},{0x1428,NULL}}; // KC+D[] MK npu6opa 1
-      //----- nyck -----//
+struct DefCMD acmd[2]= {{0x1028,toPR1},{0x1428,NULL}}; // KC+D[] MK npu6opa 1
 
 void main(int argc, char *argv[])
-{	int i,i2,j,k,res;
+{	int i,i2,j,k,res,owu6ka,A1;
 	unsigned short buf;
-	int cnt_K2=0;
     pid_t pid_timer;
     timer_t id_timer;
 	struct itimerspec timer;
     struct sigevent event;
 //	obmen_41_31_t from41;
-	short b2,num_KS=0;	//номер канала связи 1 - нр-к1, 2 - пр-к2 	
+	short b2; 	
 	unsigned int N_TIMER=0;//кол-во срабатываний таймера
-	short TIMER10=0;//обмен с пр1.0	
-	short TIMER41=0;	
-	int Pmax=0;
+	short TIMER10=0,TIMER41=0;//обмен с пр1.0	
+	short Pmax=0,STEP_AS=0,STEP_AS1=0;
 	float A; //угол поправки по разности
 	struct ispr_mo3k *ispr;
-	int direction=0; //направление движения антенны
-	float U1,U2; //расчет направления
 //----- onucaHue gaHHblx npu pa6ome c MK -----//
-int short owu6ka,i1;
-pid_t pid,pid_K1,pid_41,pid_42;
 dev_tx_t *dev;
-unsigned short Kypc,Ckopocmb,KpeH,DuHT;
 unsigned short q=1,ncu=2,mema=3;
-int StateK1=1,StateK2=0;//0 - stop, 1-start
-int TestK2=0;//доп настройки К2
+
 float 	C1,C2,C3,C4,C5,C6,C7,C8;
-int A1;
 int TIMESEV,setANT=0,minus_x;
 	double PSI=0,TETA=0,oldPSI,oldTETA;
 	double x,y,x1,y1,C,S,ri,r1,r2,r3,
 	x2=0,y2=0;//дельты по качкам
-	double prim,primq,primcos;
 float KK=0,KK1=0;  //курс корабля
 //const AgpecHK=28,AgpecCEB=31,nogAgpecHK=0,nogAgpecCEB=0;// agpeca OY
 const AgpecHK=28,AgpecCEB=18,nogAgpecHK=0,nogAgpecCEB=0;// agpeca OY ???(CEB=17,18)
@@ -81,9 +64,8 @@ unsigned char s,pewuM_K1;
 int		 SIMF[6]={0,0,0,0}; //наличие симфонии 0,1 - ModA :  2,3 - ModB : 4,5 - sevA
 int		 MODB[2]={0,0};
 //----- onucaHue daHHblx npu pa6ome c np.4-1,4-2 -----//
-#define V 1400
-unsigned short DCEB[6];//Dout42[V];
-
+unsigned short DCEB[6];
+	
  C1=2048./pi;C2=4096.0/360.0;C3=180./pi;C4=C1*Kncu;
  C5=C2*Kncu;C6=C1*Kq;C7=C3;C8=C2*Kq;
 
@@ -99,7 +81,6 @@ unsigned short DCEB[6];//Dout42[V];
     timer.it_interval.tv_nsec = 100*msec;
     timer_settime( id_timer, 0, &timer, NULL );
 
-
 	printf("\nCTAPT M3\n");
 
 	create_shmem();
@@ -107,11 +88,13 @@ unsigned short DCEB[6];//Dout42[V];
 	open_shmem();
 
 	ispr = (struct ispr_mo3k *) & p->to_MO3.to42.Mispr;
-	p->pr1_c=0;
+	p->pr1_c=p->count_as=0;
+	memset(&p->lvl_as,  0,20);
+	memset(&p->mass_lvl,0,22);
 	//----- Hacmpouka MaH4ecm.KaH. -----//
 	owu6ka=0;dev=OpenTx(pci_index);
 
-	if(regim_kk(dev,Ynp_np1,true)==-1){owu6ka|=0x4000;}//Heucnp-Mble.owu6ku
+	if(regim_kk(dev,Ynp_np1,true)==-1)   {owu6ka|=0x4000;}//Heucnp-Mble.owu6ku
 	if(regim_ou(dev,HK,AgpecHK,true)==-1){owu6ka|=0x2000;}
 	if(regim_ou(dev,CEB,AgpecCEB,true)==-1) printf("Error OU CEB\n");
 	Init_ModB();
@@ -230,14 +213,13 @@ for(;;)//----- CEPBEP -----//
 		if (p->Dout41[2]&0x8000) TETA=-(0xffff-p->Dout41[2])*pi/(1<<15);
 		    else TETA=p->Dout41[2]*pi/(1<<15);
 
-//			if (dev->tx_B[6]==0x8000) PSI=0;
-//			if (dev->tx_B[7]==0x8000) TETA=0;
+		//if (dev->tx_B[6]==0x8000) PSI=0;
+		//if (dev->tx_B[7]==0x8000) TETA=0;
 
-	//	if (abs(PSI)>1/4)  PSI=oldPSI;
-	//	if (abs(TETA)>1/4) TETA=oldTETA;
+		//if (abs(PSI)>1/4)  PSI=oldPSI;
+		//if (abs(TETA)>1/4) TETA=oldTETA;
 		//printf(" TETA=%f(%f) PSI=%f(%f)\n",PSI,PSI*57.32,TETA,TETA*57.32);
-	//	printf(" A_simf "); 	for(j=0;j<9;j++) printf("%04x ",p->Dout41[j]);printf("\n");
-		
+		//printf(" A_simf "); 	for(j=0;j<9;j++) printf("%04x ",p->Dout41[j]);printf("\n");
   		break;
 	case 4:owu6ka|=32;break; // HEBEPEH proxy HK
 	case 5://--- npueM KY cuHxp HK ---//
@@ -280,7 +262,6 @@ for(;;)//----- CEPBEP -----//
 			 }			 
 		
 		//printf("B- ");	for(j=2;j<17;j++) printf("%x ",Din_ModB[j]);printf("\n");
-		//ispr->nkB=ispr->sevB=0;//временно
 		break;
 	case 12://обработчик таймера (10 Гц) 
 		N_TIMER++;//счетчик тиков 
@@ -308,7 +289,6 @@ for(;;)//----- CEPBEP -----//
 
 				if (KK1>4.71225)  p->jump=-1;	
 				if (KK1<-4.71225) p->jump=1;
-
 				KK1=KK1+2*p->jump*pi;
 				*/
 				oldKK=KK1; //сохраним установленный азимут
@@ -328,8 +308,9 @@ for(;;)//----- CEPBEP -----//
 				if (KK1<-4.71225) KK1=KK1+2*PI;
 				
 				if (p->from_MO3.from41.beta>=0)	p->toPR1[2]=-p->from_MO3.from41.beta*C1;//Угол места
+				
 		    	else p->toPR1[2]=(360+(-p->from_MO3.from41.beta*C3))*C2;//
-				p->toPR1[0]=KK1*RADtoGRAD/2+1991;//Азимут	
+				p->toPR1[0]=KK1*RADtoGRAD/2+1991;//Азимут
 //!!!
 				/*x=(double)KK1; //азимут от 4-1	
 				if (x<0) {x+=2*PI;minus_x=1;} else minus_x=0;
@@ -393,32 +374,86 @@ for(;;)//----- CEPBEP -----//
 				
 				if (p->from_MO3.from42.Rejim_AS==1) //режим АС
 				{
-					printf("lvl = %d r0 = %f",p->to_MO3.to41.UR_sign_K1,p->U.RAZN_0);
-					//p->to_MO3.to42.pr_rejim_AS=1;
-					//if ((p->to_MO3.to41.UR_sign_K1>35)&&(p->U.RAZN_0>0.7))	//1.1
-					//	A1=-p->U.RAZN_0*31.48;
-					//else	A1=0;
-					//A1=0;
-					if ((p->to_MO3.to41.UR_sign_K1>35)&&(p->to_MO3.to41.UR_sign_K1<60))
+					if(p->count_as>3)
 					{
-						//if (p->U.RAZN_0>0.7)  {A1=-3;p->toPR1[0]=(p->PR1[0]&0x0fff)+A1;}
-						//else if (p->U.RAZN_0<0.4)    {A1=3;p->toPR1[0]=(p->PR1[0]&0x0fff)+A1;}
-						//	 else A1=0;
-						if (Pmax==0) p->toPR1[0]=(p->PR1[0]&0x0fff)+3;	 
-						else 
+						for(i=0;i<5;i++) p->mass_lvl[STEP_AS]+=p->lvl_as[i];
+						p->mass_lvl[STEP_AS]=p->mass_lvl[STEP_AS]/4;//считаем среднее
+						p->count_as=0;
+						switch(STEP_AS)
 						{
-							if 
-							Pmax=p->to_MO3.to41.UR_sign_K1;
+						case 0:  printf("STEP0->STEP1 lvl0=%d\n",p->mass_lvl[STEP_AS]);
+								 STEP_AS1++;
+								 STEP_AS=1; break;
+						case 1: 
+							if (p->mass_lvl[STEP_AS]>p->mass_lvl[STEP_AS-1]) 
+							{
+								printf("STEP1->STEP2 lvl1=%d\n",p->mass_lvl[STEP_AS]); 
+								STEP_AS1++;
+								//p->mass_lvl[STEP_AS-1]=p->mass_lvl[STEP_AS]; //сохраним первый в нулевой
+								STEP_AS=2;
+							} //если уровень увеличился, то едем дальше. 
+							else 
+							{
+								printf("STEP2->STEP3 lvl1=%d\n",p->mass_lvl[STEP_AS]); 
+								STEP_AS=3;
+								STEP_AS1-=2;								
+							}	//иначе едем назад
+							break;
+						case 2:	
+							if (p->mass_lvl[STEP_AS]>p->mass_lvl[STEP_AS-1]) 
+							{
+								STEP_AS1++;
+								printf("STEP2++ lvl2=%d\n",p->mass_lvl[STEP_AS]);
+								p->mass_lvl[STEP_AS-1]=p->mass_lvl[STEP_AS]; //сохраним второй в первый								
+								//STEP_AS=3;
+							} //если уровень увеличился, то едем дальше. 
+							else 
+							{ 
+								printf("STEP2 stop lvl2=%d\n",p->mass_lvl[STEP_AS]); 
+								STEP_AS1--;
+								p->mass_lvl[0]=p->mass_lvl[STEP_AS];
+								STEP_AS=4;
+							}	//иначе стоим и ждем изменения уроовня
+							break;
+						case 3:	
+							if (p->mass_lvl[STEP_AS]>p->mass_lvl[STEP_AS-2]) 
+							{ 
+								STEP_AS1--;
+								printf("STEP3-- lvl3=%d\n",p->mass_lvl[STEP_AS]); 
+								p->mass_lvl[STEP_AS-2]=p->mass_lvl[STEP_AS]; //сохраним третий в первый	
+							} //если уровень увеличился, то едем дальше. 
+							else 
+							{ 
+								printf("STEP3 stop lvl3=%d\n",p->mass_lvl[STEP_AS]);
+								p->mass_lvl[0]=p->mass_lvl[STEP_AS];
+								STEP_AS=4; 
+								STEP_AS1++;
+							}	//иначе стоим и ждем изменения уроовня
+							break;
+						case 4:
+							printf("lvl0=%d lvl4=%d\n",p->mass_lvl[0],p->mass_lvl[STEP_AS]);
+							if (((p->mass_lvl[0]*1.5)<p->mass_lvl[STEP_AS])||(p->mass_lvl[0]>(p->mass_lvl[STEP_AS]*1.5))) STEP_AS=STEP_AS1=Pmax=p->count_as=0; //Уровень сигнала и шаг поиска
+							break;
+						/*case 4:	if (p->mass_lvl[STEP_AS]>p->mass_lvl[STEP_AS-1]) { printf("STEP4->STEP5 lvl4=%d\n",p->mass_lvl[STEP_AS]); STEP_AS=4;} //если уровень увеличился, то едем дальше. 
+							else { printf("STEP4->STEP7 lvl4=%d\n",p->mass_lvl[STEP_AS]); STEP_AS=7; }	//иначе стоим и ждем изменения уроовня
+							break;
+						case 5:	if (p->mass_lvl[STEP_AS]>p->mass_lvl[STEP_AS-1]) { printf("STEP5->STEP7 lvl5=%d\n",p->mass_lvl[STEP_AS]); STEP_AS=7;} //если уровень увеличился, то едем дальше. 
+							else { printf("STEP5->STEP7 lvl5=%d\n",p->mass_lvl[STEP_AS]); STEP_AS=7; }	//иначе стоим и ждем изменения уроовня
+							break;							
+						case 7:
+							
+							break;*/
 							
 						}
-							 
-					}
+						p->toPR1[0]=KK1*RADtoGRAD/2+1991+STEP_AS1*7;
 					
-					printf("Pr1=%d A1=%d newPr1+%d\n",p->PR1[0]&0x0fff,A1,p->toPR1[0]);
+					/*printf("lvl = %d r0 = %f",p->to_MO3.to41.UR_sign_K1,p->U.RAZN_0);
+					printf("Pr1=%d A1=%d newPr1+%d\n",p->PR1[0]&0x0fff,A1,p->toPR1[0]);*/
+					}
 				}
 				else //если не АС
 				{
-					Pmax=0;
+					STEP_AS=STEP_AS1=Pmax=p->count_as=0; //Уровень сигнала и шаг поиска
 					if (KK1==0)
 					{
 						//printf("PSI=%f TETA=%f  ",PSI,TETA);

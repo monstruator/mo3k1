@@ -20,17 +20,10 @@
 #define DPL1  7
 #define YP    8
 #define DPL2 10
-
-//-------k2----
 pid_t proxy_DRV2=0,
 	  proxy_RS; // Mod_B 
-unsigned short Din_ModB[24];  
-char masK2[]={0x55, 0x04, 0x03, 0x01, 0x5d};
 int rez=0, err=0 ;
 unsigned char massiv[9];
-unsigned short DATA_K1[15000];
-//-------------
-//UPOS upos;
 char nastroika[]={0xB8, 0x00, 0x00, 0x00, 0xB9, 0x4B};
 pid_t proxy_DRV1=0; 
 int msg=25,rmsg,cntl_code=0,ii=1;
@@ -49,7 +42,7 @@ int	porog_i;
 float f_itog_urov=0,f_itog_razn=0,f_dop=0,koef=2.7e-9;
 
 int f=1;
-int q=0;
+//int q=0;
 float floatSUM_4;
 float porog_sf = 0;
 float SREDN;
@@ -149,7 +142,6 @@ Write_K1(n_com)
 	wr_cpcs_s.uom.dt[1]=n_com;
 	Send(pid_drv,&wr_cpcs_s,&wr_cpcs_r,sizeof(wr_cpcs_s),sizeof(wr_cpcs_r));
 }
-
 
 int Read_K1()
 {
@@ -293,8 +285,7 @@ int DDRead_K1()
     // выдача команды и прием данных
 	i=Send(pid_drv,&rd_cpcs_s,&rd_cpcs_r,sizeof(rd_cpcs_s),sizeof(rd_cpcs_r));
 	//printf("Ответ =");
-	for(i=0;i<rd_cpcs_r.cnt;i++) printf(" %02x",rd_cpcs_r.uim.dt[i]);
-    printf("\n");
+	for(i=0;i<rd_cpcs_r.cnt;i++) printf(" %02x",rd_cpcs_r.uim.dt[i]);    printf("\n");
     // переформатирование
     for (i=0;i<rd_cpcs_r.cnt;i++)  massivK1[i+CK1]=rd_cpcs_r.uim.dt[i];//дополним массив
 	CK1=CK1+rd_cpcs_r.cnt;//увеличим кол-во байт в буфере
@@ -322,7 +313,7 @@ int DDRead_K1()
 				    if (massivK1[0]==0xd3) memcpy(&p->U.SUM_20,&massiv[0],4);
 					for(i=6;i<CK1;i++) massivK1[i-6]=massivK1[i];
 					if ((p->U.SUM_4 <= 1e6) | (p->U.SUM_4 > 1e14)){
-						q+=1;
+						//q+=1;
 						//printf("\n q = %d  -=MINUS=- = %e",q, p->U.SUM_4);
 						//floatSUM_4 += 0;						
 					}

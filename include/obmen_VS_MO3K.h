@@ -57,6 +57,9 @@ unsigned int DPL_2,
 		 
 typedef struct 
 {
+	unsigned short lvl_as[10],count_as; //значения и количество замеров уровня для АС
+	unsigned short mass_lvl[11]; //хранение уровней на разных углах
+	//---------------------------------------------------
 	short lvlK2;
 	unsigned short CEB[6];
 	unsigned short M[4]; //команды управления пр.1
