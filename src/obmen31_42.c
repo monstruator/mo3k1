@@ -160,7 +160,9 @@ while(1)
 			case 2  : p->M[3]=(p->M[3]&0x0380)|0x8000;break;
 			case 3  : p->M[3]=(p->M[3]&0x0380)|0xEC30;break;
 			case 4  : p->M[3]=(p->M[3]&0x0380)|0xE830;break;
-			case 5  : p->M[3]=(p->M[3]&0xF87F)|(p->from_MO3.fromAK.a_params[0]<<7);break;
+			case 5  : p->M[3]=(p->M[3]&0xF87F)|((7-p->from_MO3.fromAK.a_params[0])<<7);
+						
+						break;
 			case 6  : case 12 : p->M[3]=0x9450;break;
 			case 7  : case 13 : p->M[3]=0x8C30;break;
 			case 8  : case 11 : case 14 : p->M[3]=0x8410;break;
