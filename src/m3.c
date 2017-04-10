@@ -78,7 +78,7 @@ unsigned short DCEB[6];
     timer.it_value.tv_sec     = 1L; //start after X sec
     timer.it_value.tv_nsec    = 0L;
     timer.it_interval.tv_sec  = 0;
-    timer.it_interval.tv_nsec = 100*msec;
+    timer.it_interval.tv_nsec = 200*msec;
     timer_settime( id_timer, 0, &timer, NULL );
 
 	printf("\nCTAPT M3\n");
@@ -269,7 +269,6 @@ for(;;)//----- CEPBEP -----//
 		if (TIMER41>1) //  3/10 Hz
 		{
 			TIMER10++;
-			//printf("TIMER10=%d\n",TIMER10);
 			if (TIMER10<10)	ispr->mo1k=0; //есть пр1.0
 			else ispr->mo1k=1; //нет пр1.0 
 			
@@ -389,7 +388,6 @@ for(;;)//----- CEPBEP -----//
 							{
 								printf("STEP1->STEP2 lvl1=%d\n",p->mass_lvl[STEP_AS]); 
 								STEP_AS1++;
-								//p->mass_lvl[STEP_AS-1]=p->mass_lvl[STEP_AS]; //сохраним первый в нулевой
 								STEP_AS=2;
 							} //если уровень увеличился, то едем дальше. 
 							else 
@@ -434,21 +432,8 @@ for(;;)//----- CEPBEP -----//
 							printf("lvl0=%d lvl4=%d\n",p->mass_lvl[0],p->mass_lvl[STEP_AS]);
 							if (((p->mass_lvl[0]*1.5)<p->mass_lvl[STEP_AS])||(p->mass_lvl[0]>(p->mass_lvl[STEP_AS]*1.5))) STEP_AS=STEP_AS1=Pmax=p->count_as=0; //Уровень сигнала и шаг поиска
 							break;
-						/*case 4:	if (p->mass_lvl[STEP_AS]>p->mass_lvl[STEP_AS-1]) { printf("STEP4->STEP5 lvl4=%d\n",p->mass_lvl[STEP_AS]); STEP_AS=4;} //если уровень увеличился, то едем дальше. 
-							else { printf("STEP4->STEP7 lvl4=%d\n",p->mass_lvl[STEP_AS]); STEP_AS=7; }	//иначе стоим и ждем изменения уроовня
-							break;
-						case 5:	if (p->mass_lvl[STEP_AS]>p->mass_lvl[STEP_AS-1]) { printf("STEP5->STEP7 lvl5=%d\n",p->mass_lvl[STEP_AS]); STEP_AS=7;} //если уровень увеличился, то едем дальше. 
-							else { printf("STEP5->STEP7 lvl5=%d\n",p->mass_lvl[STEP_AS]); STEP_AS=7; }	//иначе стоим и ждем изменения уроовня
-							break;							
-						case 7:
-							
-							break;*/
-							
 						}
 						p->toPR1[0]=KK1*RADtoGRAD/2+1991+STEP_AS1*7;
-					
-					/*printf("lvl = %d r0 = %f",p->to_MO3.to41.UR_sign_K1,p->U.RAZN_0);
-					printf("Pr1=%d A1=%d newPr1+%d\n",p->PR1[0]&0x0fff,A1,p->toPR1[0]);*/
 					}
 				}
 				else //если не АС
@@ -492,11 +477,12 @@ for(;;)//----- CEPBEP -----//
 				//if (KK1>pi) KK1=-KK1;
 				if (KK1>4.71225) KK1=KK1-2*PI;
 				if (KK1<-4.71225) KK1=KK1+2*PI;
-				printf("Peleng=%2.2f KK=%1.2f KK1=%1.2f\n", p->from_MO3.fromAK.Peleng, KK, KK1);
+				//printf("Peleng=%2.2f KK=%1.2f KK1=%1.2f\n", p->from_MO3.fromAK.Peleng, KK, KK1);
 				p->toPR1[0]=KK1*RADtoGRAD/2+1991;//└чшьєЄ	
 			}
 				//-------------------------------------------------------------
 			TIMER41=0;
+			//printf("SIMF0=%d SIMF1=%d\n",SIMF[0],SIMF[1]);
 			if (SIMF[1]<SIMF[0]) ispr->nkA=0; //есть симф A
 			else ispr->nkA=1; //нет симф 
 			SIMF[1]=SIMF[0];
@@ -514,12 +500,12 @@ for(;;)//----- CEPBEP -----//
 		} //конец 3-х Герц
 		//-------------------------- 10 Hz -------------------------
 		p->toPR1[3]=p->M[0];		p->toPR1[4]=p->M[1];
-		p->toPR1[5]=p->M[2];		p->toPR1[6]=p->M[3];	
+		p->toPR1[5]=p->M[2];		p->toPR1[6]=p->M[3];		
 
 		for(i=0;i<3;i++) p->toPR1[i]=p->toPR1[i]&0x0fff;
 		//-------------------------- 1 Pr -------------------------
 		for(i=0;i<8;i++) toPR1[i]=p->toPR1[i];
-		//for(i=0;i<3;i++) printf("  %x",toPR1[i]);printf("   to  \n");
+		//for(i=6;i<7;i++) printf("  %x",toPR1[i]);printf("   to  \n");
 		if((KK_frame(dev,Ynp_np1,2,acmd))==-1){owu6ka|=16;break;}
 
 		if (ispr->nkA==1) Write_ModB(); //если нет навигации запрос в Модуль Б

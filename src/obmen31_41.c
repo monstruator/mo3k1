@@ -20,10 +20,9 @@
   # define max_len_IP     4096*8
 
 
-	float Dbl, Flt=0;
+	float Flt=0;
 	static Udp_Client_t Uc41,Uc42;
 	char bufi[1024];
-	char bufo[1024];
 	char gloria_start=0;	
 	char gloria_count=0;	
 	obmen_MO3_MO3K_t rec4;
@@ -31,7 +30,7 @@
 	unsigned int AK_c=0; //счетчик обмена после поступления команды АК
 	short cr_com41=0,cr_com42=0,cr_comAK=0;
 	char out_buf[1024];	
-	paramAKcom=0;
+	int paramAKcom=0;
 	simfonia41_t simfonia;	
 	int r,bytes,byta4;
 	short byta2,len_OUT,j;
@@ -49,9 +48,7 @@ main ()
 {
 float 	C1,C2,C3,C4,C5,C6,C7,C8;
 unsigned short cr_com; //порядковый номер предыдущей команды
-		short		V,dV;
-int i1=0,i2;
-int rez;
+int i1=0,i2,rez,KAR;
 unsigned short buf;
  C1=2048./pi;C2=4096.0/360.0;C3=180./pi;C4=C1*Kncu;
  C5=C2*Kncu;C6=C1*Kq;C7=C3;C8=C2*Kq;
@@ -59,16 +56,16 @@ unsigned short buf;
 //инициализация канала UDP
 	i = Udp_Client_Ini(&Uc41,"194.1.1.6",SRC_PORT41,DST_PORT41);
 	printf(" Udp_Init=%d	\n", i);
-			
-	//gloriya(1,1,31);//test K2 по умолчанию
-	//gloriya(1,1,1);//work K2
-	//gloriya(1,0,2);//work K1
-	gloriya(1,1,31);//test K2 по умолчанию
 
 	delay(2000);
 	open_shmem();
 	delay(1000);
-
+	
+	//gloriya(1,1,31);//test K2 по умолчанию
+	//gloriya(1,1,1);//work K2
+	//gloriya(1,0,2);//work K1
+	gloriya(1,1,31);//test K2 по умолчанию
+	
 while(1)
   {
 	bytes = Udp_Client_Read(&Uc41,bufi,4096);
@@ -143,7 +140,7 @@ while(1)
 						{
 							case 1:	case 2:
 							//case 4:	case 5:
-							case 7:	paramAKcom=15;break; 
+							//case 7:	paramAKcom=15;break; 
 							//case 7:
 							//case 8:	
 							paramAKcom=14;break; 
@@ -158,7 +155,17 @@ while(1)
 			case 2  : p->M[3]=(p->M[3]&0x0380)|0x8000;break;
 			case 3  : p->M[3]=(p->M[3]&0x0380)|0xEC30;break;
 			case 4  : p->M[3]=(p->M[3]&0x0380)|0xE830;break;
-			case 5  : p->M[3]=(p->M[3]&0xF87F)|((7-p->from_MO3.fromAK.a_params[0])<<7);break;
+			case 5  : switch(p->from_MO3.fromAK.a_params[0])
+						{
+							case 1: KAR=4;break;
+							case 2: KAR=2;break;
+							case 3: KAR=6;break;
+							case 4: KAR=1;break;
+							case 5: KAR=5;break;
+							case 6: KAR=3;break;
+						}
+						p->M[3]=(p->M[3]&0xF87F)|(KAR<<7);
+						break;
 			case 6  : case 12 : p->M[3]=0x9450;break;
 			case 7  : case 13 : p->M[3]=0x8C30;break;
 			case 8  : case 11 : case 14 : p->M[3]=0x8410;break;
@@ -261,7 +268,7 @@ while(1)
 	p->to_MO3.to42.USign=p->PR1[6]; //уровень сигнала ПРД из сост ПР1.0
 	p->to_MO3.to42.D_K1=(float)p->U.DPL_1*244.14;
 
-	//printf("RAZN0=%f RAZN1=%f lvl=%d\n",p->U.RAZN_0,p->U.RAZN_1,p->to_MO3.to41.UR_sign_K1);
+	printf("R0=%1.4f      R1=%1.4f     lvl=%d\n",p->U.RAZN_0,p->U.RAZN_1,p->to_MO3.to41.UR_sign_K1);
     //УГЛЫ
 	p->to_MO3.to42.q=(p->PR1[0]-1991)*2/RADtoGRAD; //АЗИМУТ
 	if (p->PR1[2]&0x800) p->to_MO3.to42.beta=(360-p->PR1[2]/C2)/C3; //УГОЛ МЕСТА

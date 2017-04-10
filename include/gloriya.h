@@ -150,6 +150,7 @@ printf("ИСПР-К=%x НИ-К=%x НИ-Р=%x Готов=%x\n",msg_o.inp_r.u_inp.st_in.ISPR_K,
 msg_o.inp_r.u_inp.st_in.NI_K, msg_o.inp_r.u_inp.st_in.NI_R,
 msg_o.inp_r.u_inp.st_in.SOI_RDy);
  
+return(1); //временно в условиях маленького уровня логики. 14.03.17 
 if ((((msg_o.inp_r.u_inp.i_d>>8)&0xff)==9)	&&	((msg_o.inp_r.u_inp.i_d>>16)==current_key)) {printf("Глория норма\n");return(1);}
 else {printf("Глория не норма\n");return(0);}
 

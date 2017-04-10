@@ -139,8 +139,16 @@ void main( int argc, char *argv[] )
 				case 1 : Write_K1(ZI);    break;
 				case 2 : Write_K1(SUM20); break;
 				case 3 : Write_K1(YP);    break;
-				case 4 : Write_K1(RAZN0); break;
-				case 5 : Write_K1(SUM4); break;
+				case 4 : Write_K1(RAZN0); 
+						if (p->from_MO3.from42.Rejim_AS==1) //режим АС
+						{
+							p->lvl_as[p->count_as]=p->to_MO3.to41.UR_sign_K1; //
+							p->count_as++;
+							if (p->count_as>9) p->count_as=9; 
+						}
+						break;
+				case 5 : Write_K1(SUM4);  break;
+				case 6 : Write_K1(RAZN1); break;
 				case 7 : Write_K1(DPL1);  break;						
 				case 9 : //раз в пол сек выполняем сервисные операции
 						test_dpl=(p->from_MO3.from41.Fd+0.244)*1000; //корректировка ошибки определения Доплера в ЧУПОС

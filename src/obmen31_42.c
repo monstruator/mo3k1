@@ -50,7 +50,7 @@ main ()
 float 	C1,C2,C3,C4,C5,C6,C7,C8;
 unsigned short cr_com; //порядковый номер предыдущей команды
 short		V,dV;
-int i1=0,i2,i3;
+int i1=0,i2,i3,KAR;
 int rez;
 unsigned short buf; //для переворота управляющих слов пр. 1.0
  C1=2048./pi;C2=4096.0/360.0;C3=180./pi;C4=C1*Kncu;
@@ -145,7 +145,7 @@ while(1)
 						{
 							case 1:	case 2:
 							//case 4:	case 5:
-							case 7:	paramAKcom=15;break; 
+							//case 7:	paramAKcom=15;break; 
 							//case 7:
 							//case 8:	
 							paramAKcom=14;break; 
@@ -160,8 +160,16 @@ while(1)
 			case 2  : p->M[3]=(p->M[3]&0x0380)|0x8000;break;
 			case 3  : p->M[3]=(p->M[3]&0x0380)|0xEC30;break;
 			case 4  : p->M[3]=(p->M[3]&0x0380)|0xE830;break;
-			case 5  : p->M[3]=(p->M[3]&0xF87F)|((7-p->from_MO3.fromAK.a_params[0])<<7);
-						
+			case 5  : switch(p->from_MO3.fromAK.a_params[0])
+						{
+							case 1: KAR=4;break;
+							case 2: KAR=2;break;
+							case 3: KAR=6;break;
+							case 4: KAR=1;break;
+							case 5: KAR=5;break;
+							case 6: KAR=3;break;
+						}
+						p->M[3]=(p->M[3]&0xF87F)|(KAR<<7);
 						break;
 			case 6  : case 12 : p->M[3]=0x9450;break;
 			case 7  : case 13 : p->M[3]=0x8C30;break;
