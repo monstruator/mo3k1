@@ -55,53 +55,57 @@ rez1=Send(pid_O, &msg_i, &msg_o, sizeof(msg_i),sizeof(msg_o));
 msg_i.type=BT_WRK;
 msg_i.act_s.t_act=work;
 rez1=Send(pid_O, &msg_i, &msg_o, sizeof(msg_i),sizeof(msg_o));
-printf("Выдача сигнала Работа \n");
+//printf("Выдача сигнала Работа \n");
 
 // выдать сигнал "Режим"
 msg_i.type=BT_MD;
 msg_i.act_s.t_act=mode;
 rez1=Send(pid_O, &msg_i, &msg_o, sizeof(msg_i),sizeof(msg_o));
-printf("Выдача сигнала Режим \n");
+//printf("Выдача сигнала Режим \n");
 
 // выдать сигнал "K-1P"
 msg_i.type=BT_K_1P;
 msg_i.act_s.t_act=k_1r;
 rez1=Send(pid_O, &msg_i, &msg_o, sizeof(msg_i),sizeof(msg_o));
-printf("Выдача сигнала K-1P ");
+//printf("Выдача сигнала K-1P ");
 
 // выдать сигнал "K-2P"
 msg_i.type=BT_K_2P;
 msg_i.act_s.t_act=k_2r;
 rez1=Send(pid_O, &msg_i, &msg_o, sizeof(msg_i),sizeof(msg_o));
-printf(" K-2P ");
+//printf(" K-2P ");
 
 // выдать сигнал "K-3P"
 msg_i.type=BT_K_3P;
 msg_i.act_s.t_act=k_3r;
 rez1=Send(pid_O, &msg_i, &msg_o, sizeof(msg_i),sizeof(msg_o));
-printf(" K-3P ");
+//printf(" K-3P ");
 
 // выдать сигнал "K-4P"
 msg_i.type=BT_K_4P;
 msg_i.act_s.t_act=k_4r;
 rez1=Send(pid_O, &msg_i, &msg_o, sizeof(msg_i),sizeof(msg_o));
-printf(" K-4P ");
+//printf(" K-4P ");
 
 // выдать сигнал "K-5P"
 msg_i.type=BT_K_5P;
 msg_i.act_s.t_act=k_5r;
 rez1=Send(pid_O, &msg_i, &msg_o, sizeof(msg_i),sizeof(msg_o));
-printf(" K-5P \n");
+//printf(" K-5P \n");
 
-sleep(2);
+sleep(1);
 
 msg_i.type=GET_IN; 
 rez1=Send(pid_O, &msg_i, &msg_o, sizeof(msg_i),sizeof(msg_o));
-printf("Вх. сигналы=%x\n", msg_o.inp_r.u_inp.i_d);
-printf("ИСПР-К=%x НИ-К=%x НИ-Р=%x Готов=%x\n",msg_o.inp_r.u_inp.st_in.ISPR_K, 
+printf("Вх. сигналы=%x   ", msg_o.inp_r.u_inp.i_d);
+printf("ИСПР-К=%x НИ-К=%x НИ-Р=%x Готов=%x   ",msg_o.inp_r.u_inp.st_in.ISPR_K, 
 msg_o.inp_r.u_inp.st_in.NI_K, msg_o.inp_r.u_inp.st_in.NI_R,
 msg_o.inp_r.u_inp.st_in.SOI_RDy);
 
+#ifndef ASTRA
+	if (k_r==31) k_r=15; //для совпадения ключа и результата в контроле
+#endif
+//printf("%d %d\n",(msg_o.inp_r.u_inp.i_d>>8)&0xff,msg_o.inp_r.u_inp.i_d>>16);
 if ((((msg_o.inp_r.u_inp.i_d>>8)&0xff)==9)	&&	((msg_o.inp_r.u_inp.i_d>>16)==k_r)) {printf("Глория норма\n");return(1);}
 else {printf("Глория не норма\n");return(0);}
 
@@ -150,7 +154,6 @@ printf("ИСПР-К=%x НИ-К=%x НИ-Р=%x Готов=%x\n",msg_o.inp_r.u_inp.st_in.ISPR_K,
 msg_o.inp_r.u_inp.st_in.NI_K, msg_o.inp_r.u_inp.st_in.NI_R,
 msg_o.inp_r.u_inp.st_in.SOI_RDy);
  
-return(1); //временно в условиях маленького уровня логики. 14.03.17 
 if ((((msg_o.inp_r.u_inp.i_d>>8)&0xff)==9)	&&	((msg_o.inp_r.u_inp.i_d>>16)==current_key)) {printf("Глория норма\n");return(1);}
 else {printf("Глория не норма\n");return(0);}
 

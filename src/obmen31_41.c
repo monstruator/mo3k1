@@ -1,7 +1,16 @@
+  #ifdef ASTRA
+	#define SRC_PORT41 8209
+	#define DST_PORT41 8209
+	#define IP_ADR	"194.1.1.170"	//PC Lesha
+  #else // ASTRA not defined
+	#define SRC_PORT41 8208
+	#define DST_PORT41 8208
+	#define IP_ADR	"194.1.1.6"		//PULT
+  #endif
+  
   #include <sys/types.h>
   #include <sys/socket.h>
   #include <sys/kernel.h>
-
   #include <netinet/in.h>
   #include <stdio.h>
   #include <unistd.h>
@@ -12,32 +21,21 @@
   #include "../include/gloriya.h"
   #include "../include/IO_DT_SOI.h"
   #include "../include/func_IP.h"
-
-  #define SRC_PORT41 8208
-  #define DST_PORT41 8208
-
-  # define max_len_OUT    4096*8
-  # define max_len_IP     4096*8
-
+  #define max_len_OUT    4096*8
 
 	float Flt=0;
-	static Udp_Client_t Uc41,Uc42;
-	char bufi[1024];
-	char gloria_start=0;	
-	char gloria_count=0;	
+	static Udp_Client_t Uc41;
+	char bufi[1024], gloria_start=0, gloria_count=90;	
 	obmen_MO3_MO3K_t rec4;
 	unsigned int pr1_c_old=0, i;
 	unsigned int AK_c=0; //счетчик обмена после поступления команды АК
 	short cr_com41=0,cr_com42=0,cr_comAK=0;
-	char out_buf[1024];	
-	int paramAKcom=0;
-	simfonia41_t simfonia;	
-	int r,bytes,byta4;
+	int paramAKcom=0,bytes;
 	short byta2,len_OUT,j;
     div_t   vol;    // vol.quot - количество полных томов
-    char          pack_buf[1500];  // буфер задачи obm_41_31. Выходные данные в Socket
-    char                 numb_pack,     // текущий номер пакета
-                         numb_vol;      // текущий номер тома в пакете
+    char pack_buf[1500],  // буфер задачи obm_41_31. Выходные данные в Socket
+		 numb_pack,     // текущий номер пакета
+         numb_vol;      // текущий номер тома в пакете
 
 struct   { 
      char      out_buf[max_len_OUT];  // данные для Socket'a
@@ -47,33 +45,36 @@ struct   {
 main ()
 {
 float 	C1,C2,C3,C4,C5,C6,C7,C8;
-unsigned short cr_com; //порядковый номер предыдущей команды
 int i1=0,i2,rez,KAR;
 unsigned short buf;
+struct ispr_mo3k *ispr;
+
  C1=2048./pi;C2=4096.0/360.0;C3=180./pi;C4=C1*Kncu;
  C5=C2*Kncu;C6=C1*Kq;C7=C3;C8=C2*Kq;
 
 //инициализация канала UDP
-	i = Udp_Client_Ini(&Uc41,"194.1.1.6",SRC_PORT41,DST_PORT41);
+	i = Udp_Client_Ini(&Uc41,IP_ADR,SRC_PORT41,DST_PORT41);
 	printf(" Udp_Init=%d	\n", i);
 
 	delay(2000);
 	open_shmem();
 	delay(1000);
 	
+	memset(&p->to_MO3,0,sizeof(obmen_MO3K_MO3_t));
+	p->to_MO3.to42.Mispr = 0xFFFF;
+	ispr = (struct ispr_mo3k *) & p->to_MO3.to42.Mispr;
+	ispr->cvsA=0;
 	//gloriya(1,1,31);//test K2 по умолчанию
 	//gloriya(1,1,1);//work K2
 	//gloriya(1,0,2);//work K1
-	gloriya(1,1,31);//test K2 по умолчанию
+	//gloriya(1,1,31);//test K2 по умолчанию
 	
 while(1)
   {
 	bytes = Udp_Client_Read(&Uc41,bufi,4096);
 	//printf(" read=%d size1=%d size2=%d size3=%d sizeALL=%d\n",
 	//bytes,sizeof(obmen_42_31_2t),sizeof(obmen_41_31_2t),sizeof(obmen_AK_MN3_MO3K_t),sizeof(obmen_MO3_MO3K_t));
-
     memcpy(&rec4,&bufi[4],sizeof(obmen_MO3_MO3K_t)); 
-	//memcpy(&p->from_MO3,&bufi[4],sizeof(obmen_MO3_MO3K_t)); 
 	//выбор управляюще1 команды
 	if (rec4.from42.cr_com!=cr_com42) 
 	{
@@ -82,8 +83,8 @@ while(1)
 
 		p->num_com=rec4.from42.num_com;
 		cr_com42=rec4.from42.cr_com;
-		p->from_MO3.from42=rec4.from42;
-		//memcpy(&p->from_MO3,&bufi[4],sizeof(obmen_MO3_MO3K_t)); //копируем при утверждении команды
+		p->from_MO3.from42=rec4.from42;//копируем при утверждении команды
+		if ((p->num_com==12)||(p->num_com==14)) gloria_count=100;
 		if (p->num_com==5)
 		{
 			p->M[0]=p->from_MO3.from42.M1;
@@ -99,16 +100,15 @@ while(1)
 	}
 	if ((rec4.fromAK.cr_com!=cr_comAK)&&(rec4.fromAK.num_com!=0)) 
 	{
+		p->from_MO3.fromAK=rec4.fromAK;
 		p->num_com=rec4.fromAK.num_com;
 		cr_comAK=rec4.fromAK.cr_com;
 		pr1_c_old=p->pr1_c;	//сохраним счетчик обмена с пр.1
 		AK_c=1;
 		p->to_MO3.toAK.kzv=0;
-		//memcpy(&p->from_MO3,&bufi[4],sizeof(obmen_MO3_MO3K_t)); //копируем при утверждении команды
-		p->from_MO3.fromAK=rec4.fromAK;
 		printf(" New Command AK = %d (4.1), p[0]=%d , cr_com = %d\n",
 				p->from_MO3.fromAK.num_com,p->from_MO3.fromAK.a_params[0],p->from_MO3.fromAK.cr_com);
-		if (p->num_com==301) p->M[2]=p->M[2]|0x0001; //РЭЛЕ АК
+		if ((p->num_com==301)&&(p->num_com==300)) p->M[2]=p->M[2]|0x0001; //РЭЛЕ АК
 		paramAKcom=0;
 		switch(p->num_com)
 		{
@@ -179,7 +179,9 @@ while(1)
 	//есть команда для проведения сеанса связи
 	if (rec4.from41.cr_com!=cr_com41) 
 	{
-		//memcpy(&p->from_MO3,&bufi[4],sizeof(obmen_MO3_MO3K_t)); //копируем при утверждении команды
+		if (p->num_com!=rec4.from41.num_com)
+			printf(" New Command 4.1 = %d\n",rec4.from41.num_com);
+		
 		p->from_MO3.from41=rec4.from41;
 		p->num_com=p->from_MO3.from41.num_com;
 		cr_com41=p->from_MO3.from41.cr_com;
@@ -187,14 +189,11 @@ while(1)
 		p->M[1]=0x000e;
 		p->M[2]=p->from_MO3.from42.M3&0xFFFE;
 		//p->M[3]=0x8410;		
-		printf(" New Command 4.1 = %d   (4.1)\n",p->num_com);
+		if (p->num_com==3) p->to_MO3.to41.pr_GSS=0;
 	}
 	
 	memcpy(&p->to_MO3.SIMF32,&p->Dout41[0],sizeof(p->to_MO3.SIMF32)); 
 	memcpy(&p->to_MO3.CEB,&p->CEB,sizeof(p->to_MO3.CEB)); 
-	//printf("V=%d\n",V);
-	//printf("V=%f\n",p->from41.Vr);
-	//for(i=4;i<20;i++) printf("%x ",bufi[i]);printf("\n");
 	//printf("crcom=%x n_com=%x NKS=%x NSHKR=%x Nd_FR4=%x N_FR4=%x ZUNf=%x N_psp=%x Vr=%f Ar=%f\n",
 	//p->from41.cr_com,p->from41.num_com,p->from41.num_KS,
 	//p->from41.Nkey_SHAKR,p->from41.Nd_FRCH,p->from41.N_FRCH,
@@ -212,34 +211,41 @@ while(1)
 	//printf("n_com1=%d cr_com=%d\n",p->from_MO3.from41.num_com,p->from_MO3.from41.cr_com);
 	//printf("Angl 2=%02f r=%f NK%d  \n",from41.P_ANT,p->to_MO3.to41.P_FACT,from41.num_com);
 
-	//Готовность к сеансу связи
-	if (p->num_com==1) i2++; //считаем время от первой ком нач сеанса
-	if ((gloria_start==0)&&((p->num_com==1)||(p->num_com==2)))
+	gloria_count++;
+	if (gloria_count>100)
 	{
-		if ((p->from_MO3.from41.Nkey_SHAKR<=31)&&(p->from_MO3.from41.Nkey_SHAKR>=0)) 
-			{rez=gloriya(1,p->from_MO3.from41.num_KS-1,p->from_MO3.from41.Nkey_SHAKR);gloria_start=1;}
-		else printf("Error Gloriya Key %d \n",p->from_MO3.from41.Nkey_SHAKR);
-		if (rez) p->to_MO3.to42.Mispr=p->to_MO3.to42.Mispr&0xFEFF;else p->to_MO3.to42.Mispr=p->to_MO3.to42.Mispr|0x0100;
+			switch (p->num_com)
+			{
+				case 1 : case 2 :
+					if ((p->from_MO3.from41.Nkey_SHAKR<=31)&&(p->from_MO3.from41.Nkey_SHAKR>=0))
+						rez=gloriya(1,p->from_MO3.from41.num_KS-1,p->from_MO3.from41.Nkey_SHAKR);
+					break;
+
+				case 12 :  rez = gloriya(1,0,31);//test K1
+						   printf("rez = gloriya(1,0,31);//test K1 \n\n");
+						   break;
+				case 14 :  rez = gloriya(1,1,31);//test K2
+						   break;
+			    default :  rez = gloriya(1,0,31);//test K1
+						 //printf("rez = gloriya(1,0,31);//test K1 \n\n");//mode_gl = (mode_gl==1) ? 0 : 1;
+						//rez = gloriya(1,mode_gl,31);//test K
+						//printf("def: rez = gloriya(1, %d, 31) = %d;//test K%d \n\n", mode_gl,rez,(mode_gl+1));
+			}
+
+			if (rez) ispr->gl=0;//p->to_MO3.to42.Mispr=p->to_MO3.to42.Mispr&0xFEFF;
+			else 	 ispr->gl=1;//p->to_MO3.to42.Mispr=p->to_MO3.to42.Mispr|0x0100;
+
+			gloria_count=0;
 	}
 
-	if (p->num_com==2) 
+	if (p->to_MO3.to41.pr_GSS==0)
 	{
-		gloria_count++;
-		if (gloria_count>50)
-		{
-			rez=gloriya_read();
-			if (rez) p->to_MO3.to42.Mispr=p->to_MO3.to42.Mispr&0xFEFF;else p->to_MO3.to42.Mispr=p->to_MO3.to42.Mispr|0x0100;
-			gloria_count=0;
+		if ((p->num_com==1)||(p->num_com==2)) i2++; //считаем время от первой ком нач сеанса
+		if (i2>30) 	{
+			p->to_MO3.to41.pr_GSS=1;	i2=0;
 		}
 	}
-	if (i2>30) 	{p->to_MO3.to41.pr_GSS=1;i2=0;}
-	if (p->num_com==3) gloria_start=0;
-
-	cr_com=p->from_MO3.from41.cr_com;
-	//признак автосопровождения по К1
-	//p->to_MO3.to41.pr_AS=1;
-	//призник приема данных по К2
-	//p->to_MO3.to41.pr_PD=1;
+	if (p->num_com==3) {gloria_start=p->to_MO3.to41.pr_GSS=i2=0;}
 
 /////////////////////////////////////////////////////////////////////	
 	buf=0;
@@ -251,24 +257,19 @@ while(1)
 	//printf("M1=%x M2=%x M3=%x M4=%x\n",p->from_MO3.from42.M1,p->from_MO3.from42.M2,p->from_MO3.from42.M3,p->from_MO3.from42.M4);
 
 	//Для СЕРЕЖИ
-	if (p->num_com==9) p->toPR1[6]=0xFA30;
-
-	if (p->num_com==12) p->no_navi=1;	
-	if (p->num_com==13) p->no_navi=0;	
+	if (p->num_com==9) p->toPR1[6]=0xFA30;	
 
 	//printf("cr_com=%x n_com=%x NKS=%d NSHKR=%x Nd_FR4=%d N_FR4=%x ZUNf=%x N_psp=%x Vr=%f Ar=%f\n",
 	//p->from41.cr_com,p->from41.num_com,p->from41.num_KS,
 	//p->from41.Nkey_SHAKR,p->from41.Nd_FRCH,p->from41.N_FRCH,
 	//p->from41.ZUNf,p->from41.Nans_PSP,p->from41.Vr,p->from41.Ar);
 			
-//	printf(" %04x   %04x   %04x   %04x ",p->from_MO3.from42.M1,p->from_MO3.from42.M2,p->from_MO3.from42.M3,p->from_MO3.from42.M4);
-//	printf(" CR=%d NC=%d \n",p->from_MO3.from42.cr_com,p->from_MO3.from42.num_com);
-//  printf("\n");  
+	//printf(" %04x   %04x   %04x   %04x ",p->from_MO3.from42.M1,p->from_MO3.from42.M2,p->from_MO3.from42.M3,p->from_MO3.from42.M4);
+	//printf(" CR=%d NC=%d \n",p->from_MO3.from42.cr_com,p->from_MO3.from42.num_com);
   
 	p->to_MO3.to42.USign=p->PR1[6]; //уровень сигнала ПРД из сост ПР1.0
+	p->to_MO3.to42.sum_K1=p->U.SUM_4;
 	p->to_MO3.to42.D_K1=(float)p->U.DPL_1*244.14;
-
-	printf("R0=%1.4f      R1=%1.4f     lvl=%d\n",p->U.RAZN_0,p->U.RAZN_1,p->to_MO3.to41.UR_sign_K1);
     //УГЛЫ
 	p->to_MO3.to42.q=(p->PR1[0]-1991)*2/RADtoGRAD; //АЗИМУТ
 	if (p->PR1[2]&0x800) p->to_MO3.to42.beta=(360-p->PR1[2]/C2)/C3; //УГОЛ МЕСТА
@@ -277,8 +278,16 @@ while(1)
 
 	//if (p->PR1[1]&0x800) p->to_MO3.to42.alfa=(p->PR1[1]-0xFFF)/12.27/RADtoGRAD;//КРЕН
 	//else p->to_MO3.to42.alfa=p->PR1[1]/C4; 
-	
-	//printf("MS1=%x MS2=%x MS3=%x\n",p->to_MO3.to42.Ms1,p->to_MO3.to42.Ms2,p->to_MO3.to42.Ms3);
+	p->to_MO3.to42.Ms1=p->PR1[3];   //состояние прибора 1.0
+	p->to_MO3.to42.Ms2=p->PR1[4];
+	p->to_MO3.to42.Ms3=p->PR1[5];	
+	for(i2=0;i2<16;i2++) {buf+=((p->to_MO3.to42.Ms1>>i2)&1)<<(15-i2);} p->to_MO3.to42.Ms1=buf;buf=0;
+	for(i2=0;i2<16;i2++) {buf+=((p->to_MO3.to42.Ms2>>i2)&1)<<(15-i2);} p->to_MO3.to42.Ms2=buf;buf=0;
+	for(i2=0;i2<16;i2++) {buf+=((p->to_MO3.to42.Ms3>>i2)&1)<<(15-i2);} p->to_MO3.to42.Ms3=buf;buf=0;
+	#ifdef ASTRA
+		for(i1=0;i1<6;i1++) p->to_MO3.toNT.oCEB[i1]=p->CEB[i1];
+		for(i1=0;i1<15;i1++) p->to_MO3.toNT.oHK[i1]=p->Dout41[i1];
+	#endif
 ////////////////////////////UPR AK//////////////////////////////////////
 	if (AK_c>0) //пакет с новой командой АК
 	{

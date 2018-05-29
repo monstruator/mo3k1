@@ -56,10 +56,7 @@ unsigned int DPL_2,
 	
 		 
 typedef struct 
-{
-	unsigned short lvl_as[10],count_as; //значения и количество замеров уровня для АС
-	unsigned short mass_lvl[11]; //хранение уровней на разных углах
-	//---------------------------------------------------
+{                    //--------------------------------------------------
 	short lvlK2;
 	unsigned short CEB[6];
 	unsigned short M[4]; //команды управления пр.1
@@ -73,8 +70,7 @@ typedef struct
 	unsigned short PR1[8];//данные первого прибора
 	unsigned short toPR1[8];//данные для пр. 1.0
 	unsigned short Dout41[60];
-	simfonia41_t	simfonia41;		//навигационные данные обновляются 2гц
-
+	//simfonia41_t	simfonia41;		//навигационные данные обновляются 2гц
 }SHMEM_31;
 
 
