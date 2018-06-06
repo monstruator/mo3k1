@@ -84,7 +84,17 @@ while(1)
 		p->num_com=rec4.from42.num_com;
 		cr_com42=rec4.from42.cr_com;
 		p->from_MO3.from42=rec4.from42;//копируем при утверждении команды
-		if ((p->num_com==12)||(p->num_com==14)) gloria_count=100;
+		if ((p->num_com==12)||(p->num_com==14)) 
+		{
+			gloria_count=100;
+			p->to_MO3.to42.status_test=1;
+			p->to_MO3.to42.count_test++;
+		}
+		if ((p->num_com==11)||(p->num_com==13)) 
+		{
+			p->to_MO3.to42.status_test=1;
+			p->to_MO3.to42.count_test++;
+		}
 		if (p->num_com==5)
 		{
 			p->M[0]=p->from_MO3.from42.M1;

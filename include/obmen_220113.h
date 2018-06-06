@@ -171,7 +171,8 @@ typedef struct	{
 	unsigned short	Ms2;		//Маска состояния 1 табл 8
 	unsigned short	Ms3;		//Маска состояния 1 табл 9
 	short			pr_rejim_AS;//признак автосопровождения 1-есть/0-нет
-	unsigned short 	status_test;//результат команд 11-14
+	unsigned short 	status_test;//результат команд 11-14 
+								//1-выполняется, 2-пройден, 3-ошибка
 	unsigned short	count_test; //счетчик команд 11-14
 }obmen_31_42_2t;
 

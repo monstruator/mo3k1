@@ -149,7 +149,7 @@ int reset_device( int fd )
 //--------------------------------------------------------------------------
 int read_data_nonblock1( int fd, unsigned long psize, unsigned long npackets, char *fname )
 {
-	FILE 		 	*out_fp = NULL;
+	//FILE 		 	*out_fp = NULL;
 	char		 	*data_buff;
 	unsigned long	in_buf = 0;
 	int				i = 1,i1=0;
@@ -157,17 +157,17 @@ int read_data_nonblock1( int fd, unsigned long psize, unsigned long npackets, ch
 	//short b=0;
 	int priem=0;	//счетчик циклов без приема  информации
 	unsigned long   ret;
-	unsigned char	DCP_K2[16400];	//массив дцп для пр-к2
+	unsigned char	DCP_K2[27000];	//массив дцп для пр-к2
 
 
-	if ( ( data_buff = malloc( 17000 ) ) == NULL ) {
+	if ( ( data_buff = malloc( 27000 ) ) == NULL ) {
 		fprintf( stderr, "Failed to allocate mem for the data buffer. %s\n", strerror( errno ) );
 		return ( -1 );
 	}
 
-	if (TM)
-		if ( ( out_fp = fopen( "//1/home/seversk/new31/src/usb_log", "w" ) ) == NULL ) 
-			fprintf( stderr, "Couldn't create/open file %s. %s\n", fname, strerror( errno ) );
+	//if (TM)
+	//	if ( ( out_fp = fopen( "//1/home/user/mo3k/src/usb_log", "w" ) ) == NULL ) 
+	//		fprintf( stderr, "Couldn't create/open file %s. %s\n", fname, strerror( errno ) );
 	
 
 	while (i) 
@@ -178,60 +178,55 @@ int read_data_nonblock1( int fd, unsigned long psize, unsigned long npackets, ch
 		else 
 			if ( in_buf > 0 ) 
 			{	//printf("in_buf=%d\n",in_buf);
+				//if ((in_buf+ret)>SUM_DCP_K2*2) in_buf=SUM_DCP_K2*2 - ret; //обрежем лишнее
 				if ( ( ret = read( fd, data_buff, in_buf ) ) == -1 ) 
 					fprintf( stderr, "read() error. %s\n", strerror( errno ) );
 				else //если прочитали данные
 				{
+					p->to_MO3.to41.sost_CC_K2++;
 					priem=0;	//был прием
 					for(i1=0;i1<ret;i1++) DCP_K2[i1+sum_ret]=data_buff[i1];
 					sum_ret+=ret;
-					if (TM) printf("sum_ret=%d\n",sum_ret);					
+					if (TM) printf("sum_ret=%d p->to_MO3.to41.sost_CC_K2=%d\n",sum_ret,p->to_MO3.to41.sost_CC_K2);					
 				}
 			}
 		
-		if (kbhit()&&TM) i=0;
+		//if (kbhit()&&TM) i=0;
 		
 		priem++;	//не было приема 4 cek
 
 		if ((priem>40)&&(sum_ret>0)) //{printf("reset\n");priem=0;reset_device(fd);}
 		{
-			if ((TM)&&(out_fp != NULL)) //если тестовый режим пишем в файл
-				if ( fwrite( DCP_K2, sum_ret, 1, out_fp ) != 1 )
-					fprintf( stderr, "Failed to write to file. %s\n", strerror( errno ) );
-			if ((p->from41.num_com==2)&&(p->from41.num_KS==2))//если это сеанс К2
+			//if ((TM)&&(out_fp != NULL)) //если тестовый режим пишем в файл
+			//	if ( fwrite( DCP_K2, sum_ret, 1, out_fp ) != 1 )
+			//		fprintf( stderr, "Failed to write to file. %s\n", strerror( errno ) );
+			if ((p->from_MO3.from41.num_com==2)&&(p->from_MO3.from41.num_KS==2))//если это сеанс К2
 			{
 				if (sum_ret>SUM_DCP_K2*2) sum_ret=SUM_DCP_K2*2; //обрежем лишнее
-		    	memcpy(&p->to41.DCP_K2,&DCP_K2,sum_ret);
-				p->to41.sum_DCP=sum_ret/2;			
-				p->to41.cr_SEANCE++;
-				if (TM) printf("Сформирован массив К2 N%d. Кол-во данных %d слов\n",p->to41.cr_SEANCE,p->to41.sum_DCP);				
+		    	memcpy(&p->to_MO3.to41.DCP_K2,&DCP_K2,sum_ret);
+				p->to_MO3.to41.sum_DCP=sum_ret/2;			
+				p->to_MO3.to41.cr_SEANCE++;
+				printf("Сформирован массив К2 N%d. Кол-во данных %d слов\n",p->to_MO3.to41.cr_SEANCE,p->to_MO3.to41.sum_DCP);				
 			}
 			sum_ret=0;
+			printf("Очистка массива\n");
 		}
 		delay(300);	
-//		printf("1\n");
 	}
-
 	printf( "\n" );
 	free( data_buff );
-	fclose( out_fp );
-	
+	//fclose( out_fp );
 	return ( 0 );
 }
 
 
 int main( int argc, char *argv[] )
 {
-//	unsigned long		in_buf;
-//	char		 	*data_buff;
-//	int ret;
  	int							c;
 	optparams_t					oparams;
 	int							fd;
 	int							oflag;
 
-	printf( "read_ft245 test program is started\n" );
-	
 	oparams.dev_name = strdup( "//9/dev/ft245" ); //!!!!
 	oparams.fname = NULL;
 	oparams.nonblock = 0;
@@ -284,7 +279,9 @@ int main( int argc, char *argv[] )
 				break;
 		}
 	}
-	
+
+	printf( "read_ft245 test program is started\n" );	
+	delay(5000);
 	open_shmem();
 	// open device in block or nonblock mode
 	oflag = O_RDONLY | O_NONBLOCK;

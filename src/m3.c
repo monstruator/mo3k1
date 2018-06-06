@@ -151,7 +151,12 @@ for(;;)//----- CEPBEP -----//
 		SIMF[0]++; //есть симфония
 		if (SIMF[0]==60000) SIMF[0]=0;
 		if(ou_read(dev,HK,nogAgpecHK)){owu6ka|=8;break;}
-   		if((dev->tx_B[3])!=15)  {owu6ka|=512;printf("error=%d\n",dev->tx_B[3]);break;}
+   		if((dev->tx_B[3])!=15)  
+		{
+			owu6ka|=512;
+			//printf("error=%d\n",dev->tx_B[3]);
+			break;
+		}
    		for(j=0;j<15;j++) p->Dout41[j]=dev->tx_B[4+j]; //--- npueM HK
 		#ifdef ASTRA
 			for(j=0;j<32;j++) p->to_MO3.toNT.oHK[j]=dev->tx_B[4+j];
@@ -369,7 +374,7 @@ for(;;)//----- CEPBEP -----//
 				//if (KK1>pi) KK1=-KK1;
 				if (KK1>4.71225) KK1=KK1-2*PI;
 				if (KK1<-4.71225) KK1=KK1+2*PI;
-				//printf("Peleng=%2.2f KK=%1.2f KK1=%1.2f\n", p->from_MO3.fromAK.Peleng, KK, KK1);
+				printf("Peleng=%2.2f KK=%1.2f KK1=%1.2f\n", p->from_MO3.fromAK.Peleng, KK, KK1);
 				p->toPR1[0]=KK1*RADtoGRAD/2+1991;//└чшьєЄ	
 			}
 				//-------------------------------------------------------------

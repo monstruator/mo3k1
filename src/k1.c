@@ -114,7 +114,6 @@ void main( int argc, char *argv[] )
     	pid=Receive( 0 , 0, 0 );
 		if (pid==proxy) //обработчик таймера
 		{
-			
 			if ( ( (p->num_com==11) || ( (p->num_com==12) && (ispr->gl==0) ) ) &&
 			 (cr_com42!=p->from_MO3.from42.cr_com) )
 			{
@@ -124,9 +123,11 @@ void main( int argc, char *argv[] )
 				nastr_upos(0);
 				writePorogs(1e10, 1e10);
 				delay(500);
-// временное откл. запросов к Глории
 				TstGl = TestGloriya(p->num_com-11); // 0 - test bez Gloria
 				printf("\n TestGloriya = %d \n", TstGl);
+				if (TstGl) p->to_MO3.to42.status_test=2; //пройден
+				else 	   p->to_MO3.to42.status_test=3; //ошибка
+				p->to_MO3.to42.count_test++;
 				writePorogs(1e2, 2e9);
 			}
 			if (  (p->num_com==14)  && (ispr->gl==0) && (cr_com42!=p->from_MO3.from42.cr_com) )
