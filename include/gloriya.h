@@ -19,7 +19,7 @@ int i, rez=0, err=0, rez1=0;
 
 current_key=k_r;
 
-printf("							ƒ‹ŽˆŸ ‘’€’  K%d \n",mode+1);
+printf("							ƒ‹ŽˆŸ ‘’€’  K%d     Š«îç=%d\n",mode+1,k_r);
 
 k_1r=k_r&1; k_2r=(k_r>>1)&1; k_3r=(k_r>>2)&1;
 k_4r=(k_r>>3)&1; k_5r=(k_r>>4)&1;
@@ -102,9 +102,6 @@ printf("ˆ‘-Š=%x ˆ-Š=%x ˆ-=%x ƒ®â®¢=%x   ",msg_o.inp_r.u_inp.st_in.ISPR_K,
 msg_o.inp_r.u_inp.st_in.NI_K, msg_o.inp_r.u_inp.st_in.NI_R,
 msg_o.inp_r.u_inp.st_in.SOI_RDy);
 
-#ifndef ASTRA
-	if (k_r==31) k_r=15; //¤«ï á®¢¯ ¤¥­¨ï ª«îç  ¨ à¥§ã«ìâ â  ¢ ª®­âà®«¥
-#endif
 //printf("%d %d\n",(msg_o.inp_r.u_inp.i_d>>8)&0xff,msg_o.inp_r.u_inp.i_d>>16);
 if ((((msg_o.inp_r.u_inp.i_d>>8)&0xff)==9)	&&	((msg_o.inp_r.u_inp.i_d>>16)==k_r)) {printf("ƒ«®à¨ï ­®à¬ \n");return(1);}
 else {printf("ƒ«®à¨ï ­¥ ­®à¬ \n");return(0);}

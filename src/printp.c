@@ -21,8 +21,8 @@ void main( void )
     struct itimerspec timer;
     struct sigevent event;
 	short cr_SEANCE=0;	
- 	char log_f[30] = "//1/log/logs_000000_0000";
-	char data_f[30] ="//1/log/data_000000_0000";
+ 	char log_f[30] = "//2/log/logs_000000_0000";
+	char data_f[30] ="//2/log/data_000000_0000";
 
 	open_shmem();
 
@@ -76,8 +76,8 @@ void main( void )
     	Receive( proxy, 0, 0 );
 
 		//printf("lvl = %d data=%d Nmas=%d\n",p->to_MO3.to41.UR_sign_K1,p->U.c_OI,p->to_MO3.to41.cr_SEANCE);
-		//printf("%d\n",p->from_MO3.from41.num_KS); 
-		printf(" alfa=%04x ",p->PR1[1]); 
+		printf("com=%d ",p->from_MO3.from41.num_com); 
+		//printf(" alfa=%04x ",p->PR1[1]); 
 
 //		if (p->from_MO3.from41.num_KS==1) 
 		{	
@@ -119,10 +119,15 @@ void main( void )
 	else 				   printf("r1=");
 	printf("%1.3f ",p->U.RAZN_1);
 */
+
+	//printf("gss=%02d ",p->to_MO3.to41.pr_GSS);
+	printf("lvl1=%02d ",p->to_MO3.to41.UR_sign_K1);
+	printf("inf=%e ",p->U.SUM_20);
+	
 	if (p->from_MO3.from41.num_KS==1) 
 	{
-
-		printf(" pr1=%d ",p->to_MO3.to41.GL_priem);
+		
+		printf("pr1=%d ",p->to_MO3.to41.GL_priem);
 		printf("c_OI=%d ",p->U.c_OI); //кол-во ОИ
 
 	}

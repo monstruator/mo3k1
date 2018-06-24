@@ -87,7 +87,13 @@ typedef struct	{
 	obmen_AK_MN3_MO3K_t	fromAK;
 }obmen_MO3_MO3K_t;
 
-
+typedef struct
+{
+	//unsigned short prizn_vida_inf;
+	obmen_42_31_2t from42;
+	obmen_41_31_2t from41;
+	obmen_AK_MN3_MO3K_t	fromAK;
+}obmen_ASTRA_MO3K_t;
 
 
 /*
@@ -182,9 +188,6 @@ typedef struct	{
 }obmen_CEB_HKt;
 
 typedef struct	{
-	#ifdef ASTRA
-	obmen_CEB_HKt	toNT;	// данные HK и CEB
-	#endif
 	unsigned short SIMF32[15];
 	unsigned short CEB[6];
 	obmen_31_41_2t to41;
@@ -192,3 +195,9 @@ typedef struct	{
 	obmen_AK_MO3K_MN3_t toAK;
 }obmen_MO3K_MO3_t;
 
+typedef struct	{
+	obmen_CEB_HKt	toNT;	// данные HK и CEB
+	obmen_31_42_2t to42;
+	obmen_31_41_2t to41;
+	obmen_AK_MO3K_MN3_t toAK;
+}obmen_MO3K_ASTRA_t;
