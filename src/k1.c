@@ -96,7 +96,7 @@ void main( int argc, char *argv[] )
 	*/
 	//writePorogs(SREDN*2, SREDN*2);
 	//writePorogs(1e2, SREDN*2);
-	writePorogs(1e2, 1e2);
+	writePorogs(1e8, 5e8);
 	//writePorogs(SREDN*10, SREDN*2);
 	//writePorogs( SREDN*10, 1e2);
 
