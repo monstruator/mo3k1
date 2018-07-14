@@ -48,7 +48,7 @@ main ()
 
 	//----------------------------------------- инициализация канала UDP -------------------------------------
 	i = Udp_Client_Ini(&Uc41,IP_ADR,SRC_PORT41,DST_PORT41);
-	printf(" Udp_Init=%d	\n", i);
+	printf(" Udp_Init41=%d	%s rrc=%d dst=%d\n", i, IP_ADR,SRC_PORT41,DST_PORT41);
 
 	delay(4000);
 	open_shmem();
@@ -184,7 +184,8 @@ main ()
 		if (rec4.from41.cr_com!=cr_com41) 											//есть команда для проведения сеанса связи
 		{
 			if (p->num_com!=rec4.from41.num_com)
-			printf(" New Command 4.1 = %d\n",rec4.from41.num_com);		
+			printf(" New Command 4.1 = %d\n",rec4.from41.num_com);
+		
 			p->from_MO3.from41=rec4.from41;
 			p->num_com=p->from_MO3.from41.num_com;
 			cr_com41=p->from_MO3.from41.cr_com;
@@ -196,8 +197,7 @@ main ()
 		}
 	
 		memcpy(&p->to_MO3.SIMF32,&p->Dout41[0],sizeof(p->to_MO3.SIMF32)); 
-		memcpy(&p->to_MO3.CEB,&p->CEB,sizeof(p->to_MO3.CEB)); 
-		//printf("crcom=%x n_com=%x NKS=%x NSHKR=%x Nd_FR4=%x N_FR4=%x ZUNf=%x N_psp=%x Vr=%f Ar=%f\n",
+		memcpy(&p->to_MO3.CEB,&p->CEB,sizeof(p->to_MO3.CEB)); //printf("crcom=%x n_com=%x NKS=%x NSHKR=%x Nd_FR4=%x N_FR4=%x ZUNf=%x N_psp=%x Vr=%f Ar=%f\n",
 		//p->from41.cr_com,p->from41.num_com,p->from41.num_KS,
 		//p->from41.Nkey_SHAKR,p->from41.Nd_FRCH,p->from41.N_FRCH,
 		//p->from41.ZUNf,p->from41.Nans_PSP,p->from41.Vr,p->from41.Ar);
@@ -221,7 +221,7 @@ main ()
 			{
 				case 1 : case 2 :
 					if ((p->from_MO3.from41.Nkey_SHAKR<=31)&&(p->from_MO3.from41.Nkey_SHAKR>=0))
-						rez=gloriya(1,p->from_MO3.from41.num_KS-1,p->from_MO3.from41.Nkey_SHAKR);
+						rez=gloriya(1,p->from_MO3.from41.num_KS-1,31); // p->from_MO3.from41.Nkey_SHAKR
 				break;
 
 				case 12 :  rez = gloriya(1,0,31);									//test K1

@@ -282,6 +282,7 @@ main(int argc, char *argv[])
 	Init_K2();
 	delay(500);
 	printf("			€‘’Ž‰Š€ Š2	ª®¬ ­¤  %d\n",p->from_MO3.from41.num_com);
+	printf("Diap =%d\n", p->from_MO3.from41.Nd_FRCH);
 	ispr = (struct ispr_mo3k *) & p->to_MO3.to42.Mispr;
 	
 	while(1)
@@ -594,16 +595,20 @@ main(int argc, char *argv[])
 							case 1: 														//FR
 									test_K2[9][4]=p->from_MO3.from41.N_FRCH;
 									test_K2[9][5]=p->from_MO3.from41.Nd_FRCH;
+									printf("Diap = %d\n", p->from_MO3.from41.Nd_FRCH);
 								break;
 							
 							case 2: 														//DP
 									test_K2[9][4]=0x88;
+									//p->from_MO3.from41.Nd_FRCH = p->from_MO3.from41.Nd_FRCH; // VREMENNO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 									test_K2[9][5]=p->from_MO3.from41.Nd_FRCH;
+									printf("Diap = %d\n", p->from_MO3.from41.Nd_FRCH);
 								break;
 							
 							case 3: 														//PP
 									test_K2[9][4]=0x99;
-									test_K2[9][5]=p->from_MO3.from41.Nd_FRCH + (p->from_MO3.from41.Key_FRCH<<3);
+									test_K2[9][5]=p->from_MO3.from41.Nd_FRCH  + (p->from_MO3.from41.Key_FRCH<<3); // +1 VREMENNO!!!!!!!!!! 
+									printf("Diap = %d\n", p->from_MO3.from41.Nd_FRCH+1); // +1 VREMENNO!!!!!!!!!! 
 								break;
 						}
 						//test_K2[9][4]=40;
@@ -621,7 +626,7 @@ main(int argc, char *argv[])
 								break;
 							
 							case 2: 														//DP
-									printf(" „ Š ­=%d \n",p->from_MO3.from41.Nd_FRCH);
+									printf(" „ „¨Š ­=%d Š =%d ‡ã­ä=%d\n",p->from_MO3.from41.Nd_FRCH, p->from_MO3.from41.N_FRCH, p->from_MO3.from41.ZUNf);
 								break;
 							case 3: 														//PP
 									printf("  Š ­=%d Š«îç=%d\n",p->from_MO3.from41.Nd_FRCH,p->from_MO3.from41.Key_FRCH);
@@ -703,7 +708,7 @@ main(int argc, char *argv[])
 						min =(p->CEB[3]>>12)*10 + ((p->CEB[3]>>8)&0x0F);
 						sec =((p->CEB[3]>>4)&0x0F)*10 + ((p->CEB[3])&0x0F);
 						//---------------------------------------------------------
-						sec += 1; //p->Dout41[59];
+						//sec += 1; //p->Dout41[59];
 						if (sec>59) {sec=sec-60;min++;}
 						if (min>59) {min=min-0;hour++;}
 						if (hour>23) {hour=0;day++;}

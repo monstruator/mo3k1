@@ -74,6 +74,7 @@ void main( void )
     while(1) 
 	{
     	Receive( proxy, 0, 0 );
+		printf(" „ „¨Š ­=%d Š =%d ‡ã­ä=%d „Šˆ = %d\n",p->from_MO3.from41.Nd_FRCH, p->from_MO3.from41.N_FRCH, p->from_MO3.from41.ZUNf, p->from_MO3.from41.kod_Barker);
 
 		//printf("lvl = %d data=%d Nmas=%d\n",p->to_MO3.to41.UR_sign_K1,p->U.c_OI,p->to_MO3.to41.cr_SEANCE);
 		printf("com=%d ",p->from_MO3.from41.num_com); 

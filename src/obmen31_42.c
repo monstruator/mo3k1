@@ -92,6 +92,7 @@ main ()
 				p->M[1]=p->from_MO3.from42.M2;
 				p->M[2]=p->from_MO3.from42.M3&0xFFFE;
 				p->M[3]=p->from_MO3.from42.M4;
+				printf("m0=%d, M1=%d, M2=%d, M3=%d\n", p->M[0], p->M[1], p->M[2], p->M[3]);
 				buf=0;																//переворачиваем управляющие слова пр. 1
 				for(i1=0;i1<16;i1++) {buf+=((p->M[0]>>i1)&1)<<(15-i1);} p->M[0]=buf;buf=0;
 				for(i1=0;i1<16;i1++) {buf+=((p->M[1]>>i1)&1)<<(15-i1);} p->M[1]=buf;buf=0;
@@ -296,9 +297,7 @@ main ()
 		for(i2=0;i2<16;i2++) {buf+=((p->to_MO3.to42.Ms1>>i2)&1)<<(15-i2);} p->to_MO3.to42.Ms1=buf;buf=0;
 		for(i2=0;i2<16;i2++) {buf+=((p->to_MO3.to42.Ms2>>i2)&1)<<(15-i2);} p->to_MO3.to42.Ms2=buf;buf=0;
 		for(i2=0;i2<16;i2++) {buf+=((p->to_MO3.to42.Ms3>>i2)&1)<<(15-i2);} p->to_MO3.to42.Ms3=buf;buf=0;
-		#ifdef ASTRA
-			for(i1=0;i1<6;i1++) p->to_MO3.toNT.oCEB[i1]=p->CEB[i1];
-		#endif
+
 		//---------------------------------------- UPR AK ------------------------------------------------------
 		if (AK_c>0) 																//пакет с новой командой АК
 		{

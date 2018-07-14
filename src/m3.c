@@ -47,6 +47,7 @@ void main(int argc, char *argv[])
 	double PSI=0,TETA=0,oldPSI,oldTETA;
 	double x,y,x1,y1,C,S,ri,r1,r2,r3,
 	x2=0,y2=0;																//дельты по качкам
+	double prim,primq,primcos;
 	float KK=0,KK1=0;  														//курс корабля
 	//const AgpecHK=28,AgpecCEB=31,nogAgpecHK=0,nogAgpecCEB=0;				// agpeca OY
 	const AgpecHK=28,AgpecCEB=18,nogAgpecHK=0,nogAgpecCEB=0;				// agpeca OY ???(CEB=17,18)
@@ -125,6 +126,7 @@ void main(int argc, char *argv[])
 				//for(i=0;i<3;i++) printf(" %d=%x",i,toPR1[i]);printf(" to\n");
 				//for(i=3;i<8;i++) p->PR1[i]=0;
 				//for(i=3;i<8;i++) printf(" %x",p->PR1[i]);printf("\n");
+				p->PR1[3] = 0xfff8;											// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!vremenno IVEP norm!!!!!!!!!!!!!!!
 				//p->PR1[4]=p->PR1[4]|0x00ff; 								//лишние ниже списка
 				p->Dout41[Cq]=p->PR1[0];  									// q
 				p->Dout41[Cq+1]=p->PR1[1];									// ncu
@@ -160,7 +162,7 @@ void main(int argc, char *argv[])
 				SIMF[0]++; //есть симфония
 				if (SIMF[0]==60000) SIMF[0]=0;
 				if(ou_read(dev,HK,nogAgpecHK)){owu6ka|=8;break;}
-				printf("Read: "); 	for(j=0;j<15;j++) printf("%x ",dev->tx_B[j]);printf("\n");
+				//printf("Read: "); 	for(j=0;j<15;j++) printf("%x ",dev->tx_B[j]);printf("\n");
 				if((dev->tx_B[3])!=15)  
 				{
 					owu6ka|=512;
@@ -168,7 +170,7 @@ void main(int argc, char *argv[])
 					break;
 				}
 				for(j=0;j<15;j++) p->Dout41[j]=dev->tx_B[4+j]; 				//--- npueM HK
-				printf("Dout_41: "); 	for(j=0;j<24;j++) printf("%x ",p->Dout41[j]);printf("\n");
+				//printf("Dout_41: "); 	for(j=0;j<24;j++) printf("%x ",p->Dout41[j]);printf("\n");
 
 				KK=p->Dout41[0]*pi/(1<<15);
 				//printf("Kypc=%8.4f \n",KK*57.32);
@@ -212,9 +214,10 @@ void main(int argc, char *argv[])
 				SIMF[2]++; 													// есть  ModB
 				if (SIMF[2]==60000) SIMF[2]=0;
 				i=Read_ModB(); 												// читаем данные из Мод Б
-				if ((i!=48) || (Din_ModB[0] != 'ab'))							// если не целый пакет или битый
+				//printf("ISPR mod B ab = %x HK : %d, SEV: %d\n", Din_ModB[0], Din_ModB[1], Din_ModB[17]);		// Печать наличия навигации на ЦВС3.1 Б	
+				if ((i!=48) || (Din_ModB[0] != 0xba))							// если не целый пакет или битый
 				{
-				//	printf("Error words != 48, i = %d \n", i);
+					printf("Error words != 48, i = %d     word(ab) = %x\n", i, Din_ModB[0]);
 					ispr->nkB=1;
 					break; 													// если не целый пакет - выход
 				}
@@ -227,7 +230,7 @@ void main(int argc, char *argv[])
 					for(j=0;j<15;j++) p->Dout41[j]=Din_ModB[j+2]; 			// используем из Б
 					printf("Read - B: "); for(j=0;j<17;j++) printf("%x ",Din_ModB[j]); printf("\n");			
 					//printf("Dout_41_B: "); 	for(j=0;j<15;j++) printf("%x ",p->Dout41[j]);printf("\n");
-					printf("ISPR HK mod B: %d, read: %d\n", ispr->nkB, Din_ModB[1]);		// Печать наличия навигации на ЦВС3.1 Б
+					//printf("ISPR HK mod B: %d, read: %d\n", ispr->nkB, Din_ModB[1]);		// Печать наличия навигации на ЦВС3.1 Б
 				}
 				else 
 				{
@@ -246,7 +249,8 @@ void main(int argc, char *argv[])
 					ispr->sevB=0; 											// сев Мод Б исправен
 					for(j=0;j<6;j++) p->CEB[j]=Din_ModB[18+j]; 				// npueM CEB
 				}			 		
-				//printf("B- ");	for(j=2;j<17;j++) printf("%x ",Din_ModB[j]);printf("\n");		
+				//printf("B- ");	for(j=2;j<17;j++) printf("%x ",Din_ModB[j]);printf("\n");	
+				//printf("ISPR mod B HK : %d, SEV: %d\n", Din_ModB[1], Din_ModB[17]);		// Печать наличия навигации на ЦВС3.1 Б				
 			break;
 			
 			case 12:														//обработчик таймера (10 Гц) 
@@ -338,7 +342,7 @@ void main(int argc, char *argv[])
 						if (p->Dout41[3]&0x8000) TETA=(0xffff-p->Dout41[3])*pi/(1<<14);
 						else TETA=-p->Dout41[3]*pi/(1<<14); //бортовая
 						//--------------------------------- качки ? ---------------------------------------------
-						/*x=(double)KK1; 									//азимут от 4-1
+						x=(double)KK1; 									//азимут от 4-1
 						if (x<0) 
 						{	
 							x+=2*PI;	
@@ -359,12 +363,12 @@ void main(int argc, char *argv[])
 						if (minus_x==1) x1=x1-2*PI;
 						x2=x-x1; 											//дельта по x
 						y2=y-y1; 											//дельта по y	
-						*/
+						
 						//---------------------------------- качки ? ----------------------------------------------
-						x1=KK1; //без качек
-						y1=p->from_MO3.from41.beta;							//без качек
+						//x1=KK1; //без качек
+						//y1=p->from_MO3.from41.beta;							//без качек
 						//printf("KK=%3.1f x0=%3.1f y0=%3.1f PSI=%3.1f TETA=%3.1f x1=%3.1f y1=%3.1f\n\n",
-						//	KK*grad,x*grad,y*grad,PSI*grad,TETA*grad,x1*grad,y1*grad);
+						//KK*grad,x*grad,y*grad,PSI*grad,TETA*grad,x1*grad,y1*grad);
 
 						p->toPR1[0]=x1*RADtoGRAD/2+1991;					//Азимут
 						if (y1>=0)	p->toPR1[2]=-y1*C1;						//Угол места

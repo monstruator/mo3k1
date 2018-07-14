@@ -127,7 +127,7 @@ void main(int argc, char *argv[])
 	if(regim_ou(dev,CEB,AgpecCEB,true)==-1) printf("Error OU CEB\n"); 
 
 	Dout[0]=0xba;
-	for(i=1;i<24;i++) Dout[i]=0;
+	//for(i=1;i<24;i++) Dout[i]=0;
 
 	//--------------------------------- Ожидание сообщений по МК и запросов по RS -------------------------------------------------
 	for(;;)																	//----- CEPBEP -----//
@@ -153,13 +153,13 @@ void main(int argc, char *argv[])
 					//printf("Error read HK words 15 != %d\n", dev->tx_B[3]);
 					break;
 				}	
-				printf("tx_B[3] = %d\n", dev->tx_B[3]);
+				//printf("tx_B[3] = %d\n", dev->tx_B[3]);
 				//printf("Симфония\n");
 				printf("Read:");
 				for(j=0;j<15;j++) 
 				{
 					Dout[2+j]=dev->tx_B[4+j]; 								//npueM HK
-					printf(" %02x",dev->tx_B[4+i]);
+					printf(" %02x",dev->tx_B[2+j]);
 				}
 				printf("\n");
 				errHK=0; Dout[1]=1; 										//есть симфония
