@@ -153,18 +153,16 @@ void main(int argc, char *argv[])
 					//printf("Error read HK words 15 != %d\n", dev->tx_B[3]);
 					break;
 				}	
-				//printf("tx_B[3] = %d\n", dev->tx_B[3]);
 				//printf("Симфония\n");
-				printf("Read:");
+				//printf("Read:");
 				for(j=0;j<15;j++) 
 				{
 					Dout[2+j]=dev->tx_B[4+j]; 								//npueM HK
-					printf(" %02x",dev->tx_B[2+j]);
+					//printf(" %02x",dev->tx_B[2+j]);
 				}
-				printf("\n");
+				//printf("\n");
 				errHK=0; Dout[1]=1; 										//есть симфония
-				//printf("Dout: ");
-				//for(i=0;i<17;i++) printf(" %02x",Dout[i]); printf("\n");
+
 			break;															
 	
 			case 2: break; 													// HEBEPEH proxy HK
@@ -213,7 +211,7 @@ void main(int argc, char *argv[])
 					//for(i=0;i<24;i++) {wr_cpcs_s.uom.dt[i*2]=Dout[i]&0xff;
 					//wr_cpcs_s.uom.dt[i*2+1]=(Dout[i]>>8)&0xff;}
 					memcpy(&wr_cpcs_s.uom.dt, &Dout, sizeof(Dout));
-					if ((Dout[1] != 1) && (Dout[1] != 0))printf("Error dout[1] = %d\n", Dout[1]);
+					//if ((Dout[1] != 1) && (Dout[1] != 0))printf("Error dout[1] = %d\n", Dout[1]);
 					//memset(&Dout[0], 0, sizeof(Dout));
 					//for(i=0;i<24;i++) wr_cpcs_s.uom.dt[i]=Dout[i];
 

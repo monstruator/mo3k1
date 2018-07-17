@@ -214,35 +214,26 @@ void main(int argc, char *argv[])
 				SIMF[2]++; 													// есть  ModB
 				if (SIMF[2]==60000) SIMF[2]=0;
 				i=Read_ModB(); 												// читаем данные из Мод Б
-				//printf("ISPR mod B ab = %x HK : %d, SEV: %d\n", Din_ModB[0], Din_ModB[1], Din_ModB[17]);		// Печать наличия навигации на ЦВС3.1 Б	
 				if ((i!=48) || (Din_ModB[0] != 0xba))							// если не целый пакет или битый
 				{
-					printf("Error words != 48, i = %d     word(ab) = %x\n", i, Din_ModB[0]);
+					//printf("Error words != 48, i = %d     word(ab) = %x\n", i, Din_ModB[0]);
 					ispr->nkB=1;
 					break; 													// если не целый пакет - выход
 				}
-				//printf("cvs_b nk=%x sev=%x i=%d\n",Din_ModB[1],Din_ModB[17],i);
 				//if (Din_ModB[1]==0) ispr->nkB=0; 							// всегда работает навигация в Мод Б
 				if (Din_ModB[1]==1) 										// Навигация присутствует
 				{
 					ispr->nkB=0; 											// навигац Мод Б исправна
 					if (ispr->nkA==1) 										// если нет навигации в Мод А
 					for(j=0;j<15;j++) p->Dout41[j]=Din_ModB[j+2]; 			// используем из Б
-					printf("Read - B: "); for(j=0;j<17;j++) printf("%x ",Din_ModB[j]); printf("\n");			
-					//printf("Dout_41_B: "); 	for(j=0;j<15;j++) printf("%x ",p->Dout41[j]);printf("\n");
+					//printf("Read - B: "); for(j=0;j<17;j++) printf("%x ",Din_ModB[j]); printf("\n");			
 					//printf("ISPR HK mod B: %d, read: %d\n", ispr->nkB, Din_ModB[1]);		// Печать наличия навигации на ЦВС3.1 Б
 				}
 				else 
 				{
 					ispr->nkB=1;											// Навигация на ЦВС3.1 Б - остутствует, признак на отправку
-					//if (Din_ModB[1]!=0)										// Если ошибка в формуляре
-					//{
-					//	printf("Error! Din_ModB = %d \n", Din_ModB[1]);
-					//	printf("Read - B: "); for(j=0;j<17;j++) printf("%x ",Din_ModB[j]); printf("\n");	
-					//}
 				}
-				
-				//printf("ISPR HK mod B: %d, read: %d\n", ispr->nkB, Din_ModB[1]);		// Печать наличия навигации на ЦВС3.1 Б
+		
 				if (Din_ModB[17]==0) ispr->sevB=1; 							// признак наличия СЕВ в Мод Б
 				else 
 				{
@@ -250,7 +241,6 @@ void main(int argc, char *argv[])
 					for(j=0;j<6;j++) p->CEB[j]=Din_ModB[18+j]; 				// npueM CEB
 				}			 		
 				//printf("B- ");	for(j=2;j<17;j++) printf("%x ",Din_ModB[j]);printf("\n");	
-				//printf("ISPR mod B HK : %d, SEV: %d\n", Din_ModB[1], Din_ModB[17]);		// Печать наличия навигации на ЦВС3.1 Б				
 			break;
 			
 			case 12:														//обработчик таймера (10 Гц) 

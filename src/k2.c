@@ -282,7 +282,7 @@ main(int argc, char *argv[])
 	Init_K2();
 	delay(500);
 	printf("			НАСТРОЙКА К2	команда %d\n",p->from_MO3.from41.num_com);
-	printf("Diap =%d\n", p->from_MO3.from41.Nd_FRCH);
+	//printf("Diap =%d\n", p->from_MO3.from41.Nd_FRCH);
 	ispr = (struct ispr_mo3k *) & p->to_MO3.to42.Mispr;
 	
 	while(1)
@@ -505,6 +505,14 @@ main(int argc, char *argv[])
 								}
 								//Tpr=p->Dout41[30]*3600+p->Dout41[31]*60+p->Dout41[32]+COR_T;
 								TM=1;
+								
+								p->from_MO3.from41.ZUNf=1;
+								p->from_MO3.from41.N_FRCH=40;
+								p->from_MO3.from41.Nd_FRCH=0;
+								
+								//p->from_MO3.from41.ZUNf=2;
+								//p->from_MO3.from41.N_FRCH=40;
+								//p->from_MO3.from41.Nd_FRCH=4;
 							}							
 						}
 						else N_COM++;
@@ -600,15 +608,14 @@ main(int argc, char *argv[])
 							
 							case 2: 														//DP
 									test_K2[9][4]=0x88;
-									//p->from_MO3.from41.Nd_FRCH = p->from_MO3.from41.Nd_FRCH; // VREMENNO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 									test_K2[9][5]=p->from_MO3.from41.Nd_FRCH;
 									printf("Diap = %d\n", p->from_MO3.from41.Nd_FRCH);
 								break;
 							
 							case 3: 														//PP
 									test_K2[9][4]=0x99;
-									test_K2[9][5]=p->from_MO3.from41.Nd_FRCH  + (p->from_MO3.from41.Key_FRCH<<3); // +1 VREMENNO!!!!!!!!!! 
-									printf("Diap = %d\n", p->from_MO3.from41.Nd_FRCH+1); // +1 VREMENNO!!!!!!!!!! 
+									test_K2[9][5]=p->from_MO3.from41.Nd_FRCH  + (p->from_MO3.from41.Key_FRCH<<3);
+									printf("Diap = %d\n", p->from_MO3.from41.Nd_FRCH);
 								break;
 						}
 						//test_K2[9][4]=40;
@@ -626,7 +633,7 @@ main(int argc, char *argv[])
 								break;
 							
 							case 2: 														//DP
-									printf(" ДП ДиКан=%d КаН=%d Зунф=%d\n",p->from_MO3.from41.Nd_FRCH, p->from_MO3.from41.N_FRCH, p->from_MO3.from41.ZUNf);
+									printf(" ДП ДиКан=%d КаН=%d\n",p->from_MO3.from41.Nd_FRCH, p->from_MO3.from41.N_FRCH);
 								break;
 							case 3: 														//PP
 									printf(" ПП Кан=%d Ключ=%d\n",p->from_MO3.from41.Nd_FRCH,p->from_MO3.from41.Key_FRCH);
@@ -639,7 +646,7 @@ main(int argc, char *argv[])
  			   case 36: write_com24(24);
 						if (verbose) printf("  Начата посылка команды ДанИ.V.dV\n");
 						comOK[24]=1;N_COM++;
-						if (TS) p->toPR1[3]=0x8000;											//8000-onn 0 dBm 0000-off TVK
+						//if (TS) p->toPR1[3]=0x8000;											//8000-onn 0 dBm 0000-off TVK
 						Tstart=p->from_MO3.from41.T_SS-8; 									//время старта за 10 сек до сеанса
 						//Tpr=p->Dout41[30]*3600+p->Dout41[31]*60+p->Dout41[32]; 			//время прибора из СЕВ
 					    p->Dout41[30]=(p->CEB[2]>>8)&0x000F;
@@ -708,7 +715,7 @@ main(int argc, char *argv[])
 						min =(p->CEB[3]>>12)*10 + ((p->CEB[3]>>8)&0x0F);
 						sec =((p->CEB[3]>>4)&0x0F)*10 + ((p->CEB[3])&0x0F);
 						//---------------------------------------------------------
-						//sec += 1; //p->Dout41[59];
+						sec += 1;//p->Dout41[59]; 
 						if (sec>59) {sec=sec-60;min++;}
 						if (min>59) {min=min-0;hour++;}
 						if (hour>23) {hour=0;day++;}
@@ -724,7 +731,7 @@ main(int argc, char *argv[])
 						if (verbose)
 						{
 							printf(") Команда ДанП.Т.Р отпр\n");
-							printf("\n           day=%d hour=%d min=%d sec=%d msec=%d out=%d d=%f d1=%d\n",day,hour,min,sec,p->Dout41[59],p->CEB[4]>>12,p->from_MO3.from41.D,D1);
+							printf("\n           day=%d hour=%d min=%d sec=%d msec=%d out=%d d=%f d1=%d korr=%d\n",day,hour,min,sec,p->Dout41[59],p->CEB[4]>>12,p->from_MO3.from41.D,D1,p->Dout41[59]);
 						}
 					break;
 			   

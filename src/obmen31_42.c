@@ -90,7 +90,8 @@ main ()
 			{
 				p->M[0]=p->from_MO3.from42.M1;
 				p->M[1]=p->from_MO3.from42.M2;
-				p->M[2]=p->from_MO3.from42.M3&0xFFFE;
+				p->M[2]=p->from_MO3.from42.M3&0xFFFE;  // ant = 1 / ekv = 0
+				//------------- vremenno ----------------------------------------------------
 				p->M[3]=p->from_MO3.from42.M4;
 				printf("m0=%d, M1=%d, M2=%d, M3=%d\n", p->M[0], p->M[1], p->M[2], p->M[3]);
 				buf=0;																//переворачиваем управляющие слова пр. 1
@@ -227,7 +228,7 @@ main ()
 			{
 				case 1 : case 2 :
 					if ((p->from_MO3.from41.Nkey_SHAKR<=31)&&(p->from_MO3.from41.Nkey_SHAKR>=0))
-					rez=gloriya(1,p->from_MO3.from41.num_KS-1, 31); //p->from_MO3.from41.Nkey_SHAKR
+					rez=gloriya(1,p->from_MO3.from41.num_KS-1, 31); //p->from_MO3.from41.Nkey_SHAKR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!VREMENNO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				break;
 
 				case 12 :  rez = gloriya(1,0,31);									//test K1

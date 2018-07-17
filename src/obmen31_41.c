@@ -221,7 +221,7 @@ main ()
 			{
 				case 1 : case 2 :
 					if ((p->from_MO3.from41.Nkey_SHAKR<=31)&&(p->from_MO3.from41.Nkey_SHAKR>=0))
-						rez=gloriya(1,p->from_MO3.from41.num_KS-1,31); // p->from_MO3.from41.Nkey_SHAKR
+						rez=gloriya(1,p->from_MO3.from41.num_KS-1,31); // p->from_MO3.from41.Nkey_SHAKR !!!!!!!!!!!!!!!!VREMENNO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				break;
 
 				case 12 :  rez = gloriya(1,0,31);									//test K1
